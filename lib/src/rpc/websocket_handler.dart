@@ -23,7 +23,7 @@ class WebSocketHandler extends HttpHandler {
   WebSocketHandler(core.Service service) : super(service);
 
   @override
-  void handler(HttpRequest request, ServiceContext context) async {
+  Future handler(HttpRequest request, ServiceContext context) async {
     if (request.headers[HttpHeaders.upgradeHeader]?.first != 'websocket') {
       await super.handler(request, context);
       return;

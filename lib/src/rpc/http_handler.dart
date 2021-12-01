@@ -186,7 +186,7 @@ class HttpHandler implements Handler<HttpServer> {
     await handler(request, context);
   }
 
-  void handler(HttpRequest request, ServiceContext context) async {
+  Future handler(HttpRequest request, ServiceContext context) async {
     final response = request.response;
     if (request.contentLength > service.maxRequestLength) {
       response.statusCode = HttpStatus.requestEntityTooLarge;

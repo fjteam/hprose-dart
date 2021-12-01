@@ -207,7 +207,7 @@ class ByteStream {
   ///
   /// @param data to be written to this stream.
   void write(dynamic data) {
-    final n = (data is ByteBuffer) ? data.lengthInBytes : data.length;
+    final int n = (data is ByteBuffer) ? data.lengthInBytes : data.length;
     if (n == 0) return;
     _grow(n);
     final bytes = _buffer;

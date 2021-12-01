@@ -53,7 +53,9 @@ void main() {
     final server = MockServer('127.0.0.1');
     service.bind(server);
     final client = Client(['mock://127.0.0.1']);
-    client..use(log.invokeHandler)..use(oneway.handler);
+    client
+      ..use(log.invokeHandler)
+      ..use(oneway.handler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -307,7 +309,7 @@ void main() {
     for (int i = 0; i <= 6; i++) {
       tasks.add(proxy.hello<String>('world'));
     }
-    await Future.wait(tasks as Iterable<Future<_>>);
+    await Future.wait(tasks as Iterable<Future>);
     final end = DateTime.now();
     print(end.difference(begin));
     server.close();

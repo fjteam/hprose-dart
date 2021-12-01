@@ -152,10 +152,10 @@ int gcd(int x, int y) {
 }
 
 class WeightedRoundRobinLoadBalance extends WeightedLoadBalance {
-  int? _maxWeight;
-  late int _gcdWeight;
-  var _index = -1;
-  int? _currentWeight = 0;
+  int _maxWeight = 0;
+  int _gcdWeight = 0;
+  int _index = -1;
+  int _currentWeight = 0;
   WeightedRoundRobinLoadBalance(Map<Uri, int> uris) : super(uris) {
     _maxWeight = _weights.reduce(max);
     _gcdWeight = _weights.reduce(gcd);
@@ -167,11 +167,11 @@ class WeightedRoundRobinLoadBalance extends WeightedLoadBalance {
       _index = (_index + 1) % n;
       if (_index == 0) {
         _currentWeight -= _gcdWeight;
-        if (_currentWeight! <= 0) {
+        if (_currentWeight <= 0) {
           _currentWeight = _maxWeight;
         }
       }
-      if (_weights[_index] >= _currentWeight!) {
+      if (_weights[_index] >= _currentWeight) {
         (context as ClientContext).uri = _uris[_index];
         return next(request, context);
       }
@@ -180,13 +180,13 @@ class WeightedRoundRobinLoadBalance extends WeightedLoadBalance {
 }
 
 class NginxRoundRobinLoadBalance extends WeightedLoadBalance {
-  late List<int> _effectiveWeights;
-  late List<int?> _currentWeights;
+  List<int> _effectiveWeights = [];
+  List<int> _currentWeights = [];
   final _random = Random.secure();
   NginxRoundRobinLoadBalance(Map<Uri, int> uris) : super(uris) {
     final n = uris.length;
     _effectiveWeights = _weights.toList(growable: false);
-    _currentWeights = List<int?>(n)..fillRange(0, n, 0);
+    _currentWeights = List<int>.filled(n, 0);
   }
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) async {
@@ -223,13 +223,13 @@ class NginxRoundRobinLoadBalance extends WeightedLoadBalance {
 }
 
 class WeightedLeastActiveLoadBalance extends WeightedLoadBalance {
-  late List<int> _effectiveWeights;
-  late List<int?> _actives;
+  late List<int> _effectiveWeights = [];
+  late List<int> _actives = [];
   final _random = Random.secure();
   WeightedLeastActiveLoadBalance(Map<Uri, int> uris) : super(uris) {
     final n = uris.length;
     _effectiveWeights = _weights.toList(growable: false);
-    _actives = List<int?>(n)..fillRange(0, n, 0);
+    _actives = List<int>.filled(n, 0);
   }
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) async {

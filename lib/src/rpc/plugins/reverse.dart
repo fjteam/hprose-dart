@@ -190,7 +190,7 @@ class Provider {
   Method? get(String name) => _methodManager.get(name);
   void add(Method method) => _methodManager.add(method);
   void remove(String name) => _methodManager.remove(name);
-  void addMethod(Function method, [String name]) =>
+  void addMethod(Function method, [String name = '']) =>
       _methodManager.addMethod(method, name);
   void addMethods(List<Function> methods, [List<String>? names]) =>
       _methodManager.addMethods(methods, names);
@@ -201,9 +201,9 @@ class Provider {
 class _Proxy {
   final Caller _caller;
   final String _id;
-  String? _namespace;
+  String _namespace = '';
   _Proxy(this._caller, this._id, this._namespace) {
-    if (_namespace != null && _namespace!.isNotEmpty) {
+    if (_namespace.isNotEmpty) {
       _namespace += '_';
     } else {
       _namespace = '';
@@ -216,7 +216,7 @@ class _Proxy {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    var name = _namespace! + _getName(invocation.memberName);
+    var name = _namespace + _getName(invocation.memberName);
     if (invocation.isGetter) {
       return _Proxy(_caller, _id, name);
     }
@@ -424,7 +424,7 @@ class Caller {
     return (await _invoke(id, name, args, T)) as T?;
   }
 
-  dynamic useService(String id, [String? namespace]) {
+  dynamic useService(String id, [String namespace = '']) {
     return _Proxy(this, id, namespace);
   }
 

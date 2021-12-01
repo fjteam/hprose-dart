@@ -48,8 +48,8 @@ class Reader {
   void readClass() {
     final name = ValueReader.readString(stream!);
     final count = ValueReader.readCount(stream!);
-    final names = List<String?>(count);
-    final types = List<Type?>(count);
+    final names = List<String?>.filled(count, null);
+    final types = List<Type?>.filled(count, null);
     final type = TypeManager.getType(name);
     final strDeserialize = Deserializer.getInstance<String>();
     for (var i = 0; i < count; ++i) {
@@ -63,7 +63,8 @@ class Reader {
   }
 
   TypeInfo getTypeInfo(int index) => _ref[index];
-  dynamic readReference() => _refer?.readReference(ValueReader.readInt(stream!));
+  dynamic readReference() =>
+      _refer?.readReference(ValueReader.readInt(stream!));
   void addReference(value) => _refer?.addReference(value);
   void setReference(int index, dynamic value) =>
       _refer?.setReference(index, value);

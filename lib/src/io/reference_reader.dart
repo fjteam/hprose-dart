@@ -55,7 +55,7 @@ class ReferenceReader {
   static List<T?> readList<T>(Reader reader) {
     final stream = reader.stream!;
     final count = ValueReader.readCount(stream);
-    final list = List<T?>(count);
+    final list = List<T?>.filled(count, null);
     reader.addReference(list);
     for (var i = 0; i < count; ++i) {
       list[i] = reader.deserialize<T>();
@@ -100,7 +100,8 @@ class ReferenceReader {
     final types = typeInfo.types;
     final count = names.length;
     for (var i = 0; i < count; ++i) {
-      obj[names[i]] = Deserializer.get(types[i].toString())!.deserialize(reader);
+      obj[names[i]] =
+          Deserializer.get(types[i].toString())!.deserialize(reader);
     }
     stream.readByte();
     return obj;
@@ -108,7 +109,8 @@ class ReferenceReader {
 
   static dynamic readObject(Reader reader, String type) {
     final obj = readDynamicObject(reader);
-    final dynamic Function(Map<String, dynamic>) constructor = TypeManager.getConstructor(type)!;
+    final dynamic Function(Map<String, dynamic>) constructor =
+        TypeManager.getConstructor(type)!;
     return constructor(obj);
   }
 
@@ -128,7 +130,8 @@ class ReferenceReader {
 
   static dynamic readMapAsObject(Reader reader, String type) {
     final obj = readMapAsDynamicObject(reader);
-    final dynamic Function(Map<String, dynamic>) constructor = TypeManager.getConstructor(type)!;
+    final dynamic Function(Map<String, dynamic>) constructor =
+        TypeManager.getConstructor(type)!;
     return constructor(obj);
   }
 }

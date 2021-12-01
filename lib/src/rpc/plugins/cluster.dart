@@ -99,8 +99,9 @@ class Cluster {
         final bool idempotent = context.containsKey('idempotent')
             ? context['idempotent']
             : config.idempotent;
-        final int? retry =
-            context.containsKey('retry') ? context['retry'] : config.idempotent as int?;
+        final int? retry = context.containsKey('retry')
+            ? context['retry']
+            : config.idempotent as int?;
         if (!context.containsKey('retried')) {
           context['retried'] = 0;
         }
@@ -144,12 +145,12 @@ class Cluster {
     final clientContext = context as ClientContext;
     final uris = clientContext.client!.uris;
     final n = uris.length;
-    final results = List<Future?>(n);
+    final results = List<Future?>.filled(n, null);
     for (var i = 0; i < n; ++i) {
       final forkingContext = clientContext.clone() as ClientContext;
       forkingContext.uri = uris[i];
       results[i] = next(name, args, forkingContext);
     }
-    return Future.wait(results as Iterable<Future<_>>);
+    return Future.wait(results as Iterable<Future<dynamic>>);
   }
 }

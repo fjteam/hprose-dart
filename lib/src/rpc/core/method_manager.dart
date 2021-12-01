@@ -41,7 +41,7 @@ class MethodManager {
     }
   }
 
-  void addMethod(Function method, [String name]) {
+  void addMethod(Function method, [String name = '']) {
     add(Method(method, name: name));
   }
 
@@ -52,7 +52,7 @@ class MethodManager {
       }
     } else {
       for (var i = 0; i < _methods.length; ++i) {
-        add(Method(_methods[i]));
+        add(Method(_methods[i], name: ''));
       }
     }
   }

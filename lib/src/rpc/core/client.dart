@@ -27,9 +27,9 @@ abstract class TransportCreator<T extends Transport> {
 
 class _Proxy {
   final Client _client;
-  String? _namespace;
+  String _namespace = '';
   _Proxy(this._client, this._namespace) {
-    if (_namespace != null && _namespace!.isNotEmpty) {
+    if (_namespace.isNotEmpty) {
       _namespace += '_';
     } else {
       _namespace = '';
@@ -42,7 +42,7 @@ class _Proxy {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    var name = _namespace! + _getName(invocation.memberName);
+    var name = _namespace + _getName(invocation.memberName);
     if (invocation.isGetter) {
       return _Proxy(_client, name);
     }
@@ -132,7 +132,7 @@ class Client {
     }
   }
 
-  dynamic useService([String? namespace]) {
+  dynamic useService([String namespace = '']) {
     return _Proxy(this, namespace);
   }
 
@@ -156,7 +156,8 @@ class Client {
     }
   }
 
-  Future<T?> invoke<T>(String name, [List? args, ClientContext? context]) async {
+  Future<T?> invoke<T>(String name,
+      [List? args, ClientContext? context]) async {
     context ??= ClientContext();
     context.init(this, T);
     args ??= [];

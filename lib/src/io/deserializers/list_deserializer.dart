@@ -36,8 +36,8 @@ class ListDeserializer<T> extends BaseDeserializer<List<T?>> {
       case TagEmpty:
         return <T>[];
       case TagList:
-        return _readList(
-            reader, (count) => List<T?>(count), Deserializer.getInstance<T>());
+        return _readList(reader, (count) => List<T?>.filled(count, null),
+            Deserializer.getInstance<T>());
       default:
         return super.read(reader, tag);
     }

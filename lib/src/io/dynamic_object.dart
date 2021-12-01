@@ -35,7 +35,7 @@ class DynamicObject implements Map<String?, dynamic> {
 
   @override
   dynamic operator [](Object? key) {
-    return _items[key as String?];
+    return _items[key as String];
   }
 
   @override

@@ -144,7 +144,7 @@ class Service {
   Method? get(String name) => _methodManager.get(name);
   void add(Method method) => _methodManager.add(method);
   void remove(String name) => _methodManager.remove(name);
-  void addMethod(Function method, [String name]) =>
+  void addMethod(Function method, [String name = '']) =>
       _methodManager.addMethod(method, name);
   void addMethods(List<Function> methods, [List<String>? names]) =>
       _methodManager.addMethods(methods, names);
