@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class DurationDeserializer extends BaseDeserializer<Duration> {
-  static final AbstractDeserializer<Duration> instance = DurationDeserializer();
+  static final AbstractDeserializer<Duration?> instance = DurationDeserializer();
   @override
-  Duration read(Reader reader, int tag) {
+  Duration? read(Reader reader, int tag) {
     final stream = reader.stream;
     switch (tag) {
       case TagDate:
@@ -31,9 +31,9 @@ class DurationDeserializer extends BaseDeserializer<Duration> {
                 ReferenceReader.readTime(reader).microsecondsSinceEpoch);
       case TagInteger:
       case TagLong:
-        return Duration(microseconds: ValueReader.readInt(stream));
+        return Duration(microseconds: ValueReader.readInt(stream!));
       case TagDouble:
-        return Duration(microseconds: ValueReader.readDouble(stream).floor());
+        return Duration(microseconds: ValueReader.readDouble(stream!).floor());
       default:
         if (tag >= 0x30 && tag <= 0x39) {
           return Duration(microseconds: tag - 0x30);

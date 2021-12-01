@@ -15,11 +15,11 @@
 
 part of hprose.io;
 
-class DateTimeSerializer extends ReferenceSerializer<DateTime> {
-  static final AbstractSerializer<DateTime> instance = DateTimeSerializer();
+class DateTimeSerializer extends ReferenceSerializer<DateTime?> {
+  static final AbstractSerializer<DateTime?> instance = DateTimeSerializer();
   @override
-  void write(Writer writer, DateTime value) {
+  void write(Writer writer, DateTime? value) {
     super.write(writer, value);
-    ValueWriter.writeDateTime(writer.stream, value);
+    ValueWriter.writeDateTime(writer.stream, value!);
   }
 }

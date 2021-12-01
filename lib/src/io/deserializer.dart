@@ -122,11 +122,11 @@ class _Deserializer {
     return _deserializers.containsKey(T.toString());
   }
 
-  AbstractDeserializer<T> getInstance<T>() {
-    return get(T.toString());
+  AbstractDeserializer<T?>? getInstance<T>() {
+    return get(T.toString()) as AbstractDeserializer<T?>?;
   }
 
-  AbstractDeserializer get(String type) {
+  AbstractDeserializer? get(String? type) {
     if (type == null || type.isEmpty) {
       return DynamicDeserializer.instance;
     }

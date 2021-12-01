@@ -25,7 +25,7 @@ class ObjectSerializer extends ReferenceSerializer {
     final name = TypeManager.getName(value.runtimeType.toString());
     final r = writer.writeClass(name, () {
       stream.writeByte(TagClass);
-      ValueWriter.writeStringBody(stream, name);
+      ValueWriter.writeStringBody(stream, name!);
       if (n > 0) stream.writeAsciiString(n.toString());
       stream.writeByte(TagOpenbrace);
       for (final k in data.keys) {

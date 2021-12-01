@@ -15,9 +15,9 @@
 
 part of hprose.io;
 
-class IntSerializer extends BaseSerializer<int> {
-  static final AbstractSerializer<int> instance = IntSerializer();
+class IntSerializer extends BaseSerializer<int?> {
+  static final AbstractSerializer<int?> instance = IntSerializer();
   @override
-  void write(Writer writer, int value) =>
-      ValueWriter.writeInteger(writer.stream, value);
+  void write(Writer writer, int? value) =>
+      ValueWriter.writeInteger(writer.stream, value!);
 }

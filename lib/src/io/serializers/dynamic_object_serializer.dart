@@ -15,13 +15,13 @@
 
 part of hprose.io;
 
-class DynamicObjectSerializer extends ReferenceSerializer<DynamicObject> {
-  static final AbstractSerializer<DynamicObject> instance =
+class DynamicObjectSerializer extends ReferenceSerializer<DynamicObject?> {
+  static final AbstractSerializer<DynamicObject?> instance =
       DynamicObjectSerializer();
   @override
-  void write(Writer writer, DynamicObject value) {
+  void write(Writer writer, DynamicObject? value) {
     final stream = writer.stream;
-    final n = value.length;
+    final n = value!.length;
     final name = value.getName();
     final r = writer.writeClass(name, () {
       stream.writeByte(TagClass);
@@ -30,7 +30,7 @@ class DynamicObjectSerializer extends ReferenceSerializer<DynamicObject> {
       stream.writeByte(TagOpenbrace);
       for (final k in value.keys) {
         stream.writeByte(TagString);
-        ValueWriter.writeStringBody(stream, k);
+        ValueWriter.writeStringBody(stream, k!);
       }
       stream.writeByte(TagClosebrace);
       writer.addReferenceCount(n);

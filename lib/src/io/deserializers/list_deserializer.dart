@@ -16,28 +16,28 @@
 part of hprose.io;
 
 List<T> _readList<T>(Reader reader, List<T> Function(int count) listCtor,
-    AbstractDeserializer<T> deserializer) {
-  final stream = reader.stream;
+    AbstractDeserializer<T>? deserializer) {
+  final stream = reader.stream!;
   final count = ValueReader.readCount(stream);
   final list = listCtor(count);
   reader.addReference(list);
   for (var i = 0; i < count; ++i) {
-    list[i] = deserializer.deserialize(reader);
+    list[i] = deserializer!.deserialize(reader);
   }
   stream.readByte();
   return list;
 }
 
-class ListDeserializer<T> extends BaseDeserializer<List<T>> {
+class ListDeserializer<T> extends BaseDeserializer<List<T?>> {
   static final AbstractDeserializer instance = ListDeserializer();
   @override
-  List<T> read(Reader reader, int tag) {
+  List<T?>? read(Reader reader, int tag) {
     switch (tag) {
       case TagEmpty:
         return <T>[];
       case TagList:
         return _readList(
-            reader, (count) => List<T>(count), Deserializer.getInstance<T>());
+            reader, (count) => List<T?>(count), Deserializer.getInstance<T>());
       default:
         return super.read(reader, tag);
     }

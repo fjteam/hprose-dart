@@ -16,9 +16,9 @@
 part of hprose.rpc.plugins;
 
 class Forward {
-  Client _client;
-  Duration timeout;
-  Forward([List<String> uris]) {
+  late Client _client;
+  Duration? timeout;
+  Forward([List<String>? uris]) {
     _client = Client(uris);
   }
 

@@ -15,9 +15,9 @@
 
 part of hprose.io;
 
-class DoubleSerializer extends BaseSerializer<double> {
-  static final AbstractSerializer<double> instance = DoubleSerializer();
+class DoubleSerializer extends BaseSerializer<double?> {
+  static final AbstractSerializer<double?> instance = DoubleSerializer();
   @override
-  void write(Writer writer, double value) =>
-      ValueWriter.writeDouble(writer.stream, value);
+  void write(Writer writer, double? value) =>
+      ValueWriter.writeDouble(writer.stream, value!);
 }

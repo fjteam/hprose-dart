@@ -19,11 +19,11 @@ class MockTransport implements Transport {
   @override
   Future<Uint8List> transport(Uint8List request, Context context) async {
     final clientContext = context as ClientContext;
-    final uri = clientContext.uri;
+    final uri = clientContext.uri!;
     final result = _MockAgent.handler(uri.host, request);
-    if (clientContext.timeout > Duration.zero) {
+    if (clientContext.timeout! > Duration.zero) {
       var completer = Completer<Uint8List>();
-      var timer = Timer(clientContext.timeout, () {
+      var timer = Timer(clientContext.timeout!, () {
         if (!completer.isCompleted) {
           completer.completeError(TimeoutException('Timeout'));
         }
@@ -43,7 +43,7 @@ class MockTransport implements Transport {
 
 class MockTransportCreator implements TransportCreator<MockTransport> {
   @override
-  List<String> schemes = ['mock'];
+  List<String>? schemes = ['mock'];
   @override
   MockTransport create() {
     return MockTransport();

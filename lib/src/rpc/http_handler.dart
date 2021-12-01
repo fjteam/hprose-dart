@@ -54,8 +54,8 @@ class HttpHandler implements Handler<HttpServer> {
     _clientAccessPolicyXmlContent = value;
   }
 
-  void Function(dynamic error) onError;
-  void Function() onDone;
+  void Function(dynamic error)? onError;
+  void Function()? onDone;
   core.Service service;
   HttpHandler(this.service);
 
@@ -122,7 +122,7 @@ class HttpHandler implements Handler<HttpServer> {
     if (crossDomain) {
       final origin = request.headers['origin']?.first;
       if (origin != null && origin != 'null') {
-        if (_origins.isEmpty || _origins[origin]) {
+        if (_origins.isEmpty || _origins[origin]!) {
           response.headers.add('Access-Control-Allow-Origin', origin);
           response.headers.add('Access-Control-Allow-Credentials', 'true');
         }
@@ -134,19 +134,19 @@ class HttpHandler implements Handler<HttpServer> {
       httpHeaders.forEach(response.headers.add);
     }
     if (context.containsKey('httpResponseHeaders')) {
-      (context['httpResponseHeaders'] as Map<String, Object>)
+      (context['httpResponseHeaders'] as Map<String, Object>?)
           ?.forEach(response.headers.add);
     }
   }
 
   void addAccessControlAllowOrigin(String origin) {
-    if (!_origins[origin]) {
+    if (!_origins[origin]!) {
       _origins[origin] = true;
     }
   }
 
   void removeAccessControlAllowOrigin(String origin) {
-    if (_origins[origin]) {
+    if (_origins[origin]!) {
       _origins.remove(origin);
     }
   }
@@ -174,9 +174,9 @@ class HttpHandler implements Handler<HttpServer> {
     context['request'] = request;
     context['response'] = response;
     context['httpRequestHeaders'] = getHttpRequestHeaders(request);
-    context.remoteAddress = request.connectionInfo.remoteAddress;
-    context.remotePort = request.connectionInfo.remotePort;
-    context.localPort = request.connectionInfo.localPort;
+    context.remoteAddress = request.connectionInfo!.remoteAddress;
+    context.remotePort = request.connectionInfo!.remotePort;
+    context.localPort = request.connectionInfo!.localPort;
     context.handler = this;
     return context;
   }

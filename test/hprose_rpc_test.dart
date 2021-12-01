@@ -19,18 +19,18 @@ String getAddress(String name, ServiceContext context) {
 }
 
 class User {
-  String name;
-  int age;
-  bool male;
+  String? name;
+  int? age;
+  bool? male;
   User([this.name, this.age, this.male]);
-  factory User.fromJson(Map<String, dynamic> json) {
+  factory User.fromJson(Map<String?, dynamic> json) {
     return User(json['name'], json['age'], json['male']);
   }
   Map<String, dynamic> toJson() =>
       {'name': this.name, 'age': this.age, 'male': this.male};
 }
 
-User createUser(String name, {int age, bool male, Context context}) {
+User createUser(String name, {int? age, bool? male, required Context context}) {
   final serviceContext = context as ServiceContext;
   print('${serviceContext.host}');
   return User(name, age, male);
@@ -303,11 +303,11 @@ void main() {
       ..use(RateLimiter(20).invokeHandler)
       ..use(ConcurrentLimiter(100000).handler);
     final begin = DateTime.now();
-    List<Future> tasks = [];
+    List<Future?> tasks = [];
     for (int i = 0; i <= 6; i++) {
       tasks.add(proxy.hello<String>('world'));
     }
-    await Future.wait(tasks);
+    await Future.wait(tasks as Iterable<Future<_>>);
     final end = DateTime.now();
     print(end.difference(begin));
     server.close();
@@ -477,7 +477,7 @@ void main() {
       return name + args.toString();
     }
 
-    Future<String> hello(String name, CallerContext context) async {
+    Future<String?> hello(String name, CallerContext context) async {
       return await context.proxy.hi<String>(name);
     }
 

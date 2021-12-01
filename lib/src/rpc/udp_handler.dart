@@ -16,9 +16,9 @@
 part of hprose.rpc;
 
 class UdpHandler implements Handler<RawDatagramSocket> {
-  void Function(RawDatagramSocket socket) onAccept;
-  void Function(dynamic error) onError;
-  void Function() onDone;
+  void Function(RawDatagramSocket socket)? onAccept;
+  void Function(dynamic error)? onError;
+  void Function()? onDone;
   core.Service service;
   UdpHandler(this.service);
 
@@ -96,7 +96,7 @@ class UdpHandler implements Handler<RawDatagramSocket> {
 
 class UdpHandlerCreator implements HandlerCreator<UdpHandler> {
   @override
-  List<String> serverTypes = ['_RawDatagramSocket'];
+  List<String>? serverTypes = ['_RawDatagramSocket'];
 
   @override
   UdpHandler create(core.Service service) {

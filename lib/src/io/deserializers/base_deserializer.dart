@@ -15,14 +15,14 @@
 
 part of hprose.io;
 
-class BaseDeserializer<T> implements AbstractDeserializer<T> {
+class BaseDeserializer<T> implements AbstractDeserializer<T?> {
   static final AbstractDeserializer instance = BaseDeserializer();
   String type = T.toString();
-  BaseDeserializer([String type]) {
+  BaseDeserializer([String? type]) {
     if (type != null) this.type = type;
   }
   @override
-  T read(Reader reader, int tag) {
+  T? read(Reader reader, int tag) {
     switch (tag) {
       case TagNull:
         return null;
@@ -38,5 +38,5 @@ class BaseDeserializer<T> implements AbstractDeserializer<T> {
   }
 
   @override
-  T deserialize(Reader reader) => read(reader, reader.stream.readByte());
+  T? deserialize(Reader reader) => read(reader, reader.stream!.readByte());
 }

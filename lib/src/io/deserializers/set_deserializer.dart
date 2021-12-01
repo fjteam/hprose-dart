@@ -16,22 +16,22 @@
 part of hprose.io;
 
 Set<T> _readSet<T>(Reader reader, Set<T> Function() setCtor,
-    AbstractDeserializer<T> deserializer) {
-  final stream = reader.stream;
+    AbstractDeserializer<T>? deserializer) {
+  final stream = reader.stream!;
   final count = ValueReader.readCount(stream);
   final set = setCtor();
   reader.addReference(set);
   for (var i = 0; i < count; ++i) {
-    set.add(deserializer.deserialize(reader));
+    set.add(deserializer!.deserialize(reader));
   }
   stream.readByte();
   return set;
 }
 
-class SetDeserializer<T> extends BaseDeserializer<Set<T>> {
+class SetDeserializer<T> extends BaseDeserializer<Set<T?>> {
   static final AbstractDeserializer instance = SetDeserializer();
   @override
-  Set<T> read(Reader reader, int tag) {
+  Set<T?>? read(Reader reader, int tag) {
     switch (tag) {
       case TagEmpty:
         return <T>{};

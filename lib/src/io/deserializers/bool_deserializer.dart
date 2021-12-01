@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class BoolDeserializer extends BaseDeserializer<bool> {
-  static final AbstractDeserializer<bool> instance = BoolDeserializer();
+  static final AbstractDeserializer<bool?> instance = BoolDeserializer();
   @override
-  bool read(Reader reader, int tag) {
+  bool? read(Reader reader, int tag) {
     final stream = reader.stream;
     switch (tag) {
       case TagTrue:
@@ -30,15 +30,15 @@ class BoolDeserializer extends BaseDeserializer<bool> {
         return false;
       case TagInteger:
       case TagLong:
-        return ValueReader.readInt(stream) != 0;
+        return ValueReader.readInt(stream!) != 0;
       case TagDouble:
-        return ValueReader.readDouble(stream) != 0;
+        return ValueReader.readDouble(stream!) != 0;
       case TagString:
         return bool.fromEnvironment(ReferenceReader.readString(reader));
       case TagUTF8Char:
-        return '0\0'.contains(stream.readString(1));
+        return '0\0'.contains(stream!.readString(1));
       case TagInfinity:
-        stream.readByte();
+        stream!.readByte();
         return true;
       default:
         if (tag >= 0x31 && tag <= 0x39) {

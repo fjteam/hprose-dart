@@ -24,12 +24,12 @@ class ExceptionSerializer extends ReferenceSerializer<dynamic> {
     final stream = writer.stream;
     stream.writeByte(TagError);
     stream.writeByte(TagString);
-    String message;
+    String? message;
     try {
       message = value.message;
     } catch (e) {
       message = value.toString();
     }
-    ValueWriter.writeStringBody(stream, message);
+    ValueWriter.writeStringBody(stream, message!);
   }
 }

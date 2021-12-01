@@ -19,15 +19,15 @@ class JsonRpcClientCodec implements ClientCodec {
   static JsonRpcClientCodec instance = JsonRpcClientCodec();
   int _counter = 0;
   @override
-  Uint8List encode(String name, List args, ClientContext context) {
+  Uint8List encode(String name, List? args, ClientContext context) {
     final request = {'jsonrpc': '2.0', 'id': _counter++, 'method': name};
     if (context.requestHeaders.isNotEmpty) {
       request['headers'] = context.requestHeaders;
     }
-    if (args.isNotEmpty) {
+    if (args!.isNotEmpty) {
       request['params'] = args;
     }
-    return utf8.encode(json.encode(request));
+    return utf8.encode(json.encode(request)) as Uint8List;
   }
 
   @override

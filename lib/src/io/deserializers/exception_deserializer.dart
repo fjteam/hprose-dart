@@ -18,7 +18,7 @@ part of hprose.io;
 class ExceptionDeserializer extends BaseDeserializer<Exception> {
   static final AbstractDeserializer instance = ExceptionDeserializer();
   @override
-  Exception read(Reader reader, int tag) {
+  Exception? read(Reader reader, int tag) {
     switch (tag) {
       case TagError:
         return Exception(reader.deserialize<String>());

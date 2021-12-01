@@ -15,10 +15,10 @@
 
 part of hprose.io;
 
-class NumSerializer extends BaseSerializer<num> {
-  static final AbstractSerializer<num> instance = NumSerializer();
+class NumSerializer extends BaseSerializer<num?> {
+  static final AbstractSerializer<num?> instance = NumSerializer();
   @override
-  void write(Writer writer, num value) => value is int
+  void write(Writer writer, num? value) => value is int
       ? ValueWriter.writeInteger(writer.stream, value)
-      : ValueWriter.writeDouble(writer.stream, value);
+      : ValueWriter.writeDouble(writer.stream, value as double);
 }

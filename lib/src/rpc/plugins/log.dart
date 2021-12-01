@@ -21,7 +21,7 @@ class Log {
   Future<Uint8List> ioHandler(
       Uint8List request, Context context, NextIOHandler next) async {
     final enabled =
-        context.containsKey('log') ? context['log'] as bool : this.enabled;
+        context.containsKey('log') ? (context['log'] as bool?)! : this.enabled;
     if (!enabled) return next(request, context);
     try {
       print(utf8.decode(request));
@@ -34,9 +34,9 @@ class Log {
   }
 
   Future invokeHandler(
-      String name, List args, Context context, NextInvokeHandler next) async {
+      String name, List? args, Context context, NextInvokeHandler next) async {
     final enabled =
-        context.containsKey('log') ? context['log'] as bool : this.enabled;
+        context.containsKey('log') ? (context['log'] as bool?)! : this.enabled;
     if (!enabled) return next(name, args, context);
     var a = '';
     try {

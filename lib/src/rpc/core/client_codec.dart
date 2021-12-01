@@ -16,7 +16,7 @@
 part of hprose.rpc.core;
 
 abstract class ClientCodec {
-  Uint8List encode(String name, List args, ClientContext context);
+  Uint8List encode(String name, List? args, ClientContext context);
   dynamic decode(Uint8List response, ClientContext context);
 }
 
@@ -25,7 +25,7 @@ class DefaultClientCodec implements ClientCodec {
   bool simple = false;
   LongType longType = LongType.Int;
   @override
-  Uint8List encode(String name, List args, ClientContext context) {
+  Uint8List encode(String name, List? args, ClientContext context) {
     final stream = ByteStream();
     final writer = Writer(stream, simple: simple);
     final headers = context.requestHeaders;
@@ -39,7 +39,7 @@ class DefaultClientCodec implements ClientCodec {
     }
     stream.writeByte(TagCall);
     writer.serialize(name);
-    if (args.isNotEmpty) {
+    if (args!.isNotEmpty) {
       writer.reset();
       writer.serialize(args);
     }
@@ -54,7 +54,7 @@ class DefaultClientCodec implements ClientCodec {
     reader.longType = longType;
     var tag = stream.readByte();
     if (tag == TagHeader) {
-      final headers = reader.deserialize<Map<String, dynamic>>();
+      final headers = reader.deserialize<Map<String, dynamic>>()!;
       context.responseHeaders.addAll(headers);
       reader.reset();
       tag = stream.readByte();
@@ -64,7 +64,7 @@ class DefaultClientCodec implements ClientCodec {
         if (context.responseHeaders.containsKey('simple')) {
           reader.simple = true;
         }
-        return Deserializer.get(context.returnType.toString())
+        return Deserializer.get(context.returnType.toString())!
             .deserialize(reader);
       case TagError:
         throw Exception(reader.deserialize<String>());

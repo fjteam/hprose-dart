@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class DateTimeDeserializer extends BaseDeserializer<DateTime> {
-  static final AbstractDeserializer<DateTime> instance = DateTimeDeserializer();
+  static final AbstractDeserializer<DateTime?> instance = DateTimeDeserializer();
   @override
-  DateTime read(Reader reader, int tag) {
+  DateTime? read(Reader reader, int tag) {
     final stream = reader.stream;
     switch (tag) {
       case TagDate:
@@ -27,10 +27,10 @@ class DateTimeDeserializer extends BaseDeserializer<DateTime> {
         return ReferenceReader.readTime(reader);
       case TagInteger:
       case TagLong:
-        return DateTime.fromMillisecondsSinceEpoch(ValueReader.readInt(stream));
+        return DateTime.fromMillisecondsSinceEpoch(ValueReader.readInt(stream!));
       case TagDouble:
         return DateTime.fromMillisecondsSinceEpoch(
-            ValueReader.readDouble(stream).floor());
+            ValueReader.readDouble(stream!).floor());
       case TagString:
         return DateTime.parse(ReferenceReader.readString(reader));
       case TagTrue:

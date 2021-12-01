@@ -17,7 +17,7 @@ part of hprose.io;
 
 class TypeInfo {
   final String name;
-  final List<String> names;
-  final List<Type> types;
+  final List<String?> names;
+  final List<Type?> types;
   TypeInfo(this.name, this.names, this.types);
 }

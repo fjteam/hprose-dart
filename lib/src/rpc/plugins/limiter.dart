@@ -16,7 +16,7 @@
 part of hprose.rpc.plugins;
 
 class RateLimiter {
-  double _interval;
+  late double _interval;
   var _next = DateTime.now().millisecondsSinceEpoch;
   final int permitsPerSecond;
   final double maxPermits;
@@ -65,7 +65,7 @@ class ConcurrentLimiter {
     if (++_counter <= maxConcurrentRequests) return null;
     final task = Completer<void>();
     _tasks.add(task);
-    Timer timer;
+    Timer? timer;
     if (timeout > Duration.zero) {
       timer = Timer(timeout, () {
         if (_tasks.remove(task)) {

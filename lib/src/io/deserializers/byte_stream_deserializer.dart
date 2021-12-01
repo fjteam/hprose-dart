@@ -16,10 +16,10 @@
 part of hprose.io;
 
 class ByteStreamDeserializer extends BaseDeserializer<ByteStream> {
-  static final AbstractDeserializer<ByteStream> instance =
+  static final AbstractDeserializer<ByteStream?> instance =
       ByteStreamDeserializer();
   @override
-  ByteStream read(Reader reader, int tag) {
+  ByteStream? read(Reader reader, int tag) {
     final stream = reader.stream;
     switch (tag) {
       case TagBytes:
@@ -29,10 +29,10 @@ class ByteStreamDeserializer extends BaseDeserializer<ByteStream> {
       case TagString:
         return ByteStream.fromString(ReferenceReader.readString(reader));
       case TagUTF8Char:
-        return ByteStream.fromString(stream.readString(1));
+        return ByteStream.fromString(stream!.readString(1));
       case TagList:
         return ByteStream.fromUint8List(_readList(
-            reader, (count) => Uint8List(count), IntDeserializer.instance));
+            reader, (count) => Uint8List(count), IntDeserializer.instance) as Uint8List?);
       default:
         return super.read(reader, tag);
     }

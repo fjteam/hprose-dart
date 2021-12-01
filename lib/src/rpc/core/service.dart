@@ -20,7 +20,7 @@ abstract class Handler<T> {
 }
 
 abstract class HandlerCreator<T extends Handler> {
-  List<String> serverTypes;
+  List<String>? serverTypes;
   T create(Service service);
 }
 
@@ -30,9 +30,9 @@ class Service {
   static void register<T extends Handler>(
       String name, HandlerCreator<T> creator) {
     _creators[name] = creator;
-    creator.serverTypes.forEach((type) {
+    creator.serverTypes!.forEach((type) {
       if (_serverTypes.containsKey(type)) {
-        _serverTypes[type].add(name);
+        _serverTypes[type]!.add(name);
       } else {
         _serverTypes[type] = [name];
       }
@@ -45,14 +45,14 @@ class Service {
 
   ServiceCodec codec = DefaultServiceCodec.instance;
   int maxRequestLength = 0x7FFFFFFFF;
-  InvokeManager _invokeManager;
-  IOManager _ioManager;
+  late InvokeManager _invokeManager;
+  late IOManager _ioManager;
   final MethodManager _methodManager = MethodManager();
   final _handlers = <String, Handler>{};
-  Handler operator [](String name) => _handlers[name];
+  Handler? operator [](String name) => _handlers[name];
   void operator []=(String name, Handler value) => _handlers[name] = value;
   List<String> get names => _methodManager.getNames().toList();
-  MockHandler get mock => _handlers['mock'];
+  MockHandler? get mock => _handlers['mock'] as MockHandler?;
   final Map<String, dynamic> options = {};
   Service() {
     init();
@@ -71,13 +71,13 @@ class Service {
 
   ServiceContext createContext() => ServiceContext(this);
 
-  void bind(dynamic server, [String name]) {
+  void bind(dynamic server, [String? name]) {
     final type = server.runtimeType.toString();
     if (_serverTypes.containsKey(type)) {
-      final names = _serverTypes[type];
+      final names = _serverTypes[type]!;
       for (var i = 0, n = names.length; i < n; ++i) {
         if ((name == null) || (name == names[i])) {
-          _handlers[names[i]].bind(server);
+          _handlers[names[i]]!.bind(server);
         }
       }
     } else {
@@ -100,8 +100,8 @@ class Service {
     return codec.encode(result, context as ServiceContext);
   }
 
-  Future execute(String name, List args, Context context) async {
-    final method = (context as ServiceContext).method;
+  Future execute(String name, List? args, Context context) async {
+    final method = (context as ServiceContext).method!;
     if (method.missing) {
       if (method.passContext) {
         return Function.apply(method.method, [name, args, context]);
@@ -110,11 +110,11 @@ class Service {
     }
     if (method.namedParameterTypes.isEmpty) {
       if (method.contextInPositionalArguments) {
-        args.add(context);
+        args!.add(context);
       }
       return Function.apply(method.method, args);
     }
-    final namedArguments = args.removeLast();
+    final namedArguments = args!.removeLast();
     if (method.contextInNamedArguments) {
       namedArguments[Symbol('context')] = context;
     }
@@ -141,12 +141,12 @@ class Service {
     }
   }
 
-  Method get(String name) => _methodManager.get(name);
+  Method? get(String name) => _methodManager.get(name);
   void add(Method method) => _methodManager.add(method);
   void remove(String name) => _methodManager.remove(name);
   void addMethod(Function method, [String name]) =>
       _methodManager.addMethod(method, name);
-  void addMethods(List<Function> methods, [List<String> names]) =>
+  void addMethods(List<Function> methods, [List<String>? names]) =>
       _methodManager.addMethods(methods, names);
   void addMissingMethod<MissingMethod extends Function>(MissingMethod method) =>
       _methodManager.addMissingMethod(method);

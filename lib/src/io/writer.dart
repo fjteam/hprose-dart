@@ -40,7 +40,7 @@ class _WriterRefer {
 }
 
 class Writer {
-  _WriterRefer _refer;
+  _WriterRefer? _refer;
   final _ref = <dynamic, int>{};
   var _last = 0;
   final ByteStream stream;
@@ -66,7 +66,7 @@ class Writer {
   }
 
   bool writeReference(value) =>
-      simple ? false : _refer.writeReference(stream, value);
+      simple ? false : _refer!.writeReference(stream, value);
 
   void setReference(value) => _refer?.setReference(value);
 

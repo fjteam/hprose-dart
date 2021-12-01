@@ -45,7 +45,7 @@ class MockHandler implements Handler<MockServer> {
 
 class MockHandlerCreator implements HandlerCreator<MockHandler> {
   @override
-  List<String> serverTypes = ['MockServer'];
+  List<String>? serverTypes = ['MockServer'];
   @override
   MockHandler create(Service service) {
     return MockHandler(service);

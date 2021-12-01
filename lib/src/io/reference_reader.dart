@@ -17,45 +17,45 @@ part of hprose.io;
 
 class ReferenceReader {
   static Uint8List readBytes(Reader reader) {
-    final result = ValueReader.readBytes(reader.stream);
+    final result = ValueReader.readBytes(reader.stream!);
     reader.addReference(result);
     return result;
   }
 
   static String readAsciiString(Reader reader) {
-    final result = ValueReader.readAsciiString(reader.stream);
+    final result = ValueReader.readAsciiString(reader.stream!);
     reader.addReference(result);
     return result;
   }
 
   static String readString(Reader reader) {
-    final result = ValueReader.readString(reader.stream);
+    final result = ValueReader.readString(reader.stream!);
     reader.addReference(result);
     return result;
   }
 
   static String readGuid(Reader reader) {
-    final result = ValueReader.readGuid(reader.stream);
+    final result = ValueReader.readGuid(reader.stream!);
     reader.addReference(result);
     return result;
   }
 
   static DateTime readDateTime(Reader reader) {
-    final result = ValueReader.readDateTime(reader.stream);
+    final result = ValueReader.readDateTime(reader.stream!);
     reader.addReference(result);
     return result;
   }
 
   static DateTime readTime(Reader reader) {
-    final result = ValueReader.readTime(reader.stream);
+    final result = ValueReader.readTime(reader.stream!);
     reader.addReference(result);
     return result;
   }
 
-  static List<T> readList<T>(Reader reader) {
-    final stream = reader.stream;
+  static List<T?> readList<T>(Reader reader) {
+    final stream = reader.stream!;
     final count = ValueReader.readCount(stream);
-    final list = List<T>(count);
+    final list = List<T?>(count);
     reader.addReference(list);
     for (var i = 0; i < count; ++i) {
       list[i] = reader.deserialize<T>();
@@ -64,10 +64,10 @@ class ReferenceReader {
     return list;
   }
 
-  static Set<T> readSet<T>(Reader reader) {
-    final stream = reader.stream;
+  static Set<T?> readSet<T>(Reader reader) {
+    final stream = reader.stream!;
     final count = ValueReader.readCount(stream);
-    final s = <T>{};
+    final s = <T?>{};
     reader.addReference(s);
     for (var i = 0; i < count; ++i) {
       s.add(reader.deserialize<T>());
@@ -76,10 +76,10 @@ class ReferenceReader {
     return s;
   }
 
-  static Map<K, V> readMap<K, V>(Reader reader) {
-    final stream = reader.stream;
+  static Map<K?, V?> readMap<K, V>(Reader reader) {
+    final stream = reader.stream!;
     final count = ValueReader.readCount(stream);
-    final map = <K, V>{};
+    final map = <K?, V?>{};
     reader.addReference(map);
     for (var i = 0; i < count; ++i) {
       final key = reader.deserialize<K>();
@@ -91,7 +91,7 @@ class ReferenceReader {
   }
 
   static dynamic readDynamicObject(Reader reader) {
-    final stream = reader.stream;
+    final stream = reader.stream!;
     final index = ValueReader.readInt(stream, tag: TagOpenbrace);
     final typeInfo = reader.getTypeInfo(index);
     final obj = DynamicObject(typeInfo.name);
@@ -100,7 +100,7 @@ class ReferenceReader {
     final types = typeInfo.types;
     final count = names.length;
     for (var i = 0; i < count; ++i) {
-      obj[names[i]] = Deserializer.get(types[i].toString()).deserialize(reader);
+      obj[names[i]] = Deserializer.get(types[i].toString())!.deserialize(reader);
     }
     stream.readByte();
     return obj;
@@ -108,12 +108,12 @@ class ReferenceReader {
 
   static dynamic readObject(Reader reader, String type) {
     final obj = readDynamicObject(reader);
-    final constructor = TypeManager.getConstructor(type);
+    final dynamic Function(Map<String, dynamic>) constructor = TypeManager.getConstructor(type)!;
     return constructor(obj);
   }
 
   static dynamic readMapAsDynamicObject(Reader reader) {
-    final stream = reader.stream;
+    final stream = reader.stream!;
     final count = ValueReader.readCount(stream);
     final obj = DynamicObject();
     reader.addReference(obj);
@@ -128,7 +128,7 @@ class ReferenceReader {
 
   static dynamic readMapAsObject(Reader reader, String type) {
     final obj = readMapAsDynamicObject(reader);
-    final constructor = TypeManager.getConstructor(type);
+    final dynamic Function(Map<String, dynamic>) constructor = TypeManager.getConstructor(type)!;
     return constructor(obj);
   }
 }

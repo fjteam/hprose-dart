@@ -15,9 +15,9 @@
 
 part of hprose.io;
 
-class BoolSerializer extends BaseSerializer<bool> {
-  static final AbstractSerializer<bool> instance = BoolSerializer();
+class BoolSerializer extends BaseSerializer<bool?> {
+  static final AbstractSerializer<bool?> instance = BoolSerializer();
   @override
-  void write(Writer writer, bool value) =>
-      writer.stream.writeByte(value ? TagTrue : TagFalse);
+  void write(Writer writer, bool? value) =>
+      writer.stream.writeByte(value! ? TagTrue : TagFalse);
 }

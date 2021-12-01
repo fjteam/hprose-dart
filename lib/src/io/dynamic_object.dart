@@ -15,8 +15,8 @@
 
 part of hprose.io;
 
-class DynamicObject implements Map<String, dynamic> {
-  final Map<String, dynamic> _items = <String, dynamic>{};
+class DynamicObject implements Map<String?, dynamic> {
+  final Map<String?, dynamic> _items = <String?, dynamic>{};
   final String _name;
   DynamicObject([this._name = '']);
   String getName() => _name;
@@ -34,22 +34,22 @@ class DynamicObject implements Map<String, dynamic> {
   }
 
   @override
-  dynamic operator [](Object key) {
-    return _items[key];
+  dynamic operator [](Object? key) {
+    return _items[key as String?];
   }
 
   @override
-  void operator []=(String key, value) {
+  void operator []=(String? key, value) {
     _items[key] = value;
   }
 
   @override
-  void addAll(Map<String, dynamic> other) {
+  void addAll(Map<String?, dynamic> other) {
     _items.addAll(other);
   }
 
   @override
-  void addEntries(Iterable<MapEntry<String, dynamic>> newEntries) {
+  void addEntries(Iterable<MapEntry<String?, dynamic>> newEntries) {
     _items.addEntries(newEntries);
   }
 
@@ -64,20 +64,20 @@ class DynamicObject implements Map<String, dynamic> {
   }
 
   @override
-  bool containsKey(Object key) {
+  bool containsKey(Object? key) {
     return _items.containsKey(key);
   }
 
   @override
-  bool containsValue(Object value) {
+  bool containsValue(Object? value) {
     return _items.containsValue(value);
   }
 
   @override
-  Iterable<MapEntry<String, dynamic>> get entries => _items.entries;
+  Iterable<MapEntry<String?, dynamic>> get entries => _items.entries;
 
   @override
-  void forEach(void Function(String key, dynamic value) f) {
+  void forEach(void Function(String? key, dynamic value) f) {
     _items.forEach(f);
   }
 
@@ -88,40 +88,40 @@ class DynamicObject implements Map<String, dynamic> {
   bool get isNotEmpty => _items.isNotEmpty;
 
   @override
-  Iterable<String> get keys => _items.keys;
+  Iterable<String?> get keys => _items.keys;
 
   @override
   int get length => _items.length;
 
   @override
   Map<K2, V2> map<K2, V2>(
-      MapEntry<K2, V2> Function(String key, dynamic value) f) {
+      MapEntry<K2, V2> Function(String? key, dynamic value) f) {
     return _items.map<K2, V2>(f);
   }
 
   @override
-  dynamic putIfAbsent(String key, dynamic Function() ifAbsent) {
+  dynamic putIfAbsent(String? key, dynamic Function() ifAbsent) {
     return _items.putIfAbsent(key, ifAbsent);
   }
 
   @override
-  dynamic remove(Object key) {
+  dynamic remove(Object? key) {
     return _items.remove(key);
   }
 
   @override
-  void removeWhere(bool Function(String key, dynamic value) predicate) {
+  void removeWhere(bool Function(String? key, dynamic value) predicate) {
     _items.removeWhere(predicate);
   }
 
   @override
-  dynamic update(String key, Function(dynamic value) update,
-      {Function() ifAbsent}) {
+  dynamic update(String? key, Function(dynamic value) update,
+      {Function()? ifAbsent}) {
     return _items.update(key, update, ifAbsent: ifAbsent);
   }
 
   @override
-  void updateAll(Function(String key, dynamic value) update) {
+  void updateAll(Function(String? key, dynamic value) update) {
     _items.updateAll(update);
   }
 

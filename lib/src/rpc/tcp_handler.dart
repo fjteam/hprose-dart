@@ -16,11 +16,11 @@
 part of hprose.rpc;
 
 class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
-  void Function(T socket) onAccept;
-  void Function(dynamic error) onServerError;
-  void Function() onDone;
-  void Function(T socket, dynamic error) onError;
-  void Function(T socket) onClose;
+  void Function(T socket)? onAccept;
+  void Function(dynamic error)? onServerError;
+  void Function()? onDone;
+  void Function(T socket, dynamic error)? onError;
+  void Function(T socket)? onClose;
   core.Service service;
   TcpHandler(this.service);
 
@@ -31,17 +31,17 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
 
   void handler(T socket) {
     try {
-      if (onAccept != null) onAccept(socket);
+      if (onAccept != null) onAccept!(socket);
     } catch (e) {
-      if (onError != null) onError(socket, e);
+      if (onError != null) onError!(socket, e);
       socket.destroy();
-      if (onClose != null) onClose(socket);
+      if (onClose != null) onClose!(socket);
       return;
     }
     socket.listen(_receive(socket), onError: (dynamic error) {
-      if (onError != null) onError(socket, error);
+      if (onError != null) onError!(socket, error);
     }, onDone: () {
-      if (onClose != null) onClose(socket);
+      if (onClose != null) onClose!(socket);
     }, cancelOnError: true);
   }
 
@@ -72,7 +72,7 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
       index |= 0x80000000;
       response = utf8.encode(e.toString());
     }
-    _send(socket, response, index);
+    _send(socket as T, response, index);
   }
 
   void Function(List<int>) _receive(T socket) {
@@ -91,7 +91,7 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
               (header[0] & 0x80) == 0 ||
               (header[4] & 0x80) != 0) {
             if (onError != null) {
-              onError(socket, Exception('Invalid request'));
+              onError!(socket, Exception('Invalid request'));
             }
             socket.destroy();
             return;
@@ -122,7 +122,7 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
 
 class TcpHandlerCreator implements HandlerCreator<TcpHandler> {
   @override
-  List<String> serverTypes = ['_ServerSocket', 'SecureServerSocket'];
+  List<String>? serverTypes = ['_ServerSocket', 'SecureServerSocket'];
 
   @override
   TcpHandler create(core.Service service) {

@@ -17,8 +17,8 @@ part of hprose.rpc.core;
 
 class ServiceContext extends Context {
   final Service service;
-  Method method;
-  String host;
+  Method? method;
+  String? host;
   dynamic handler;
   ServiceContext(this.service);
 

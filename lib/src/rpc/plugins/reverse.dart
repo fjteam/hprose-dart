@@ -25,10 +25,10 @@ class Provider {
   var _closed = true;
   var debug = false;
   var retryInterval = Duration(seconds: 1);
-  void Function(dynamic error) onError;
+  void Function(dynamic error)? onError;
   final Client client;
   final _methodManager = MethodManager();
-  InvokeManager _invokeManager;
+  late InvokeManager _invokeManager;
   String get id {
     if (client.requestHeaders.containsKey('id')) {
       return client.requestHeaders['id'].toString();
@@ -40,13 +40,13 @@ class Provider {
     client.requestHeaders['id'] = value;
   }
 
-  Provider(this.client, [String id]) {
+  Provider(this.client, [String? id]) {
     Method.registerContextType('ProviderContext');
     _invokeManager = InvokeManager(_execute);
     if (id != null && id.isNotEmpty) this.id = id;
     addMethod(_methodManager.getNames, '~');
   }
-  Future _execute(String name, List args, Context context) async {
+  Future _execute(String name, List? args, Context context) async {
     final method = (context as ProviderContext).method;
     if (method.missing) {
       if (method.passContext) {
@@ -56,11 +56,11 @@ class Provider {
     }
     if (method.namedParameterTypes.isEmpty) {
       if (method.contextInPositionalArguments) {
-        args.add(context);
+        args!.add(context);
       }
       return Function.apply(method.method, args);
     }
-    final namedArguments = args.removeLast();
+    final namedArguments = args!.removeLast();
     if (method.contextInNamedArguments) {
       namedArguments[Symbol('context')] = context;
     }
@@ -70,7 +70,7 @@ class Provider {
   Future<List> _process(List call) async {
     final int index = call[0];
     final String name = call[1];
-    final List args = call[2].toList(growable: true);
+    final List? args = call[2].toList(growable: true);
     final method = get(name);
     try {
       if (method == null) {
@@ -78,7 +78,7 @@ class Provider {
       }
       final context = ProviderContext(client, method);
       if (!method.missing) {
-        var count = args.length;
+        var count = args!.length;
         var ppl = method.positionalParameterTypes.length;
         if (count < ppl) {
           args.length = ppl;
@@ -152,7 +152,7 @@ class Provider {
             await Future.delayed(retryInterval);
           }
           if (onError != null) {
-            onError(e);
+            onError!(e);
           }
         }
       }
@@ -173,7 +173,7 @@ class Provider {
             await Future.delayed(retryInterval);
           }
           if (onError != null) {
-            onError(e);
+            onError!(e);
           }
         }
       }
@@ -187,12 +187,12 @@ class Provider {
 
   void use(InvokeHandler handler) => _invokeManager.use(handler);
   void unuse(InvokeHandler handler) => _invokeManager.unuse(handler);
-  Method get(String name) => _methodManager.get(name);
+  Method? get(String name) => _methodManager.get(name);
   void add(Method method) => _methodManager.add(method);
   void remove(String name) => _methodManager.remove(name);
   void addMethod(Function method, [String name]) =>
       _methodManager.addMethod(method, name);
-  void addMethods(List<Function> methods, [List<String> names]) =>
+  void addMethods(List<Function> methods, [List<String>? names]) =>
       _methodManager.addMethods(methods, names);
   void addMissingMethod<MissingMethod extends Function>(MissingMethod method) =>
       _methodManager.addMissingMethod(method);
@@ -201,9 +201,9 @@ class Provider {
 class _Proxy {
   final Caller _caller;
   final String _id;
-  String _namespace;
+  String? _namespace;
   _Proxy(this._caller, this._id, this._namespace) {
-    if (_namespace != null && _namespace.isNotEmpty) {
+    if (_namespace != null && _namespace!.isNotEmpty) {
       _namespace += '_';
     } else {
       _namespace = '';
@@ -216,7 +216,7 @@ class _Proxy {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    var name = _namespace + _getName(invocation.memberName);
+    var name = _namespace! + _getName(invocation.memberName);
     if (invocation.isGetter) {
       return _Proxy(_caller, _id, name);
     }
@@ -246,12 +246,12 @@ class _Proxy {
 
 class CallerContext extends ServiceContext {
   final Caller caller;
-  dynamic proxy;
+  late dynamic proxy;
   CallerContext(this.caller, ServiceContext context) : super(context.service) {
     context.copyTo(this);
     proxy = caller.useService(caller._getId(this));
   }
-  Future<T> invoke<T>(String name, [List args]) {
+  Future<T?> invoke<T>(String name, [List? args]) {
     return caller.invoke<T>(caller._getId(this), name, args);
   }
 }
@@ -369,18 +369,18 @@ class Caller {
       final int index = item[0];
       final value = item[1];
       final error = item[2];
-      if (_results.containsKey(id) && _results[id].containsKey(index)) {
-        final result = _results[id].remove(index);
+      if (_results.containsKey(id) && _results[id]!.containsKey(index)) {
+        final result = _results[id]!.remove(index);
         if (error != null) {
-          result.completeError(Exception(error));
+          result!.completeError(Exception(error));
         } else {
-          result.complete(value);
+          result!.complete(value);
         }
       }
     }
   }
 
-  Future _invoke(String id, String name, List args, Type returnType) async {
+  Future _invoke(String id, String name, List? args, Type returnType) async {
     args ??= [];
     for (var i = 0; i < args.length; i++) {
       if (args[i] is Future) {
@@ -393,17 +393,17 @@ class Caller {
       _calls[id] = [];
     }
     final call = [index, name, args];
-    _calls[id].add(call);
+    _calls[id]!.add(call);
     if (!_results.containsKey(id)) {
       _results[id] = {};
     }
-    _results[id][index] = result;
+    _results[id]![index] = result;
     _response(id);
     if (timeout > Duration.zero) {
       var timeoutTimer = Timer(timeout, () {
         if (!result.isCompleted) {
-          _calls[id].remove(call);
-          _results[id].remove(index);
+          _calls[id]!.remove(call);
+          _results[id]!.remove(index);
           result.completeError(TimeoutException('Timeout'));
         }
       });
@@ -420,11 +420,11 @@ class Caller {
     }
   }
 
-  Future<T> invoke<T>(String id, String name, [List args]) async {
-    return (await _invoke(id, name, args, T)) as T;
+  Future<T?> invoke<T>(String id, String name, [List? args]) async {
+    return (await _invoke(id, name, args, T)) as T?;
   }
 
-  dynamic useService(String id, [String namespace]) {
+  dynamic useService(String id, [String? namespace]) {
     return _Proxy(this, id, namespace);
   }
 

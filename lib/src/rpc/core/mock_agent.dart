@@ -30,7 +30,7 @@ class _MockAgent {
 
   static Future<Uint8List> handler(String address, Uint8List request) async {
     if (_handlers.containsKey(address)) {
-      return await _handlers[address](address, request);
+      return await _handlers[address]!(address, request);
     }
     throw Exception('Server is stopped');
   }

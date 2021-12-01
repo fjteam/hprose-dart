@@ -25,10 +25,10 @@ class Service extends core.Service {
     return core.Service.isRegister(name);
   }
 
-  HttpHandler get http => this['websocket'];
-  TcpHandler get tcp => this['tcp'];
-  UdpHandler get udp => this['udp'];
-  WebSocketHandler get websocket => this['websocket'];
+  HttpHandler? get http => this['websocket'] as HttpHandler?;
+  TcpHandler? get tcp => this['tcp'] as TcpHandler<Socket>?;
+  UdpHandler? get udp => this['udp'] as UdpHandler?;
+  WebSocketHandler? get websocket => this['websocket'] as WebSocketHandler?;
 
   @override
   void init() {

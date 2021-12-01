@@ -18,12 +18,12 @@ part of hprose.rpc;
 class TcpTransport implements Transport {
   var _counter = 0;
   final _results = <Socket, Map<int, Completer<Uint8List>>>{};
-  final _sockets = <Uri, Socket>{};
+  final _sockets = <Uri?, Socket>{};
   var noDelay = true;
-  SecurityContext securityContext;
+  SecurityContext? securityContext;
   bool Function(X509Certificate certificate) onBadCertificate = (_) => true;
 
-  Future<Socket> _connect(Uri uri, Duration timeout) async {
+  Future<Socket> _connect(Uri uri, Duration? timeout) async {
     switch (uri.scheme) {
       case 'tcp':
       case 'tls':
@@ -60,12 +60,12 @@ class TcpTransport implements Transport {
         timeout: timeout);
   }
 
-  void _close(Uri uri, Socket socket, Object error) async {
+  void _close(Uri? uri, Socket socket, Object error) async {
     if (_sockets.containsKey(uri) && _sockets[uri] == socket) {
       _sockets.remove(uri);
     }
     if (_results.containsKey(socket)) {
-      var results = _results.remove(socket);
+      var results = _results.remove(socket)!;
       for (var result in results.values) {
         if (!result.isCompleted) {
           result.completeError(error);
@@ -74,7 +74,7 @@ class TcpTransport implements Transport {
     }
   }
 
-  void Function(List<int>) _receive(Uri uri, Socket socket) {
+  void Function(List<int>) _receive(Uri? uri, Socket socket) {
     final instream = ByteStream();
     const headerLength = 12;
     var bodyLength = -1;
@@ -103,7 +103,7 @@ class TcpTransport implements Transport {
           final has_error = (index & 0x80000000) != 0;
           index &= 0x7FFFFFFF;
           if (_results.containsKey(socket)) {
-            final results = _results[socket];
+            final results = _results[socket]!;
             final result = results.remove(index);
             if (has_error) {
               if (result != null && !result.isCompleted) {
@@ -123,11 +123,11 @@ class TcpTransport implements Transport {
     };
   }
 
-  Future<Socket> _getSocket(Uri uri, Duration timeout) async {
+  Future<Socket?> _getSocket(Uri? uri, Duration? timeout) async {
     if (_sockets.containsKey(uri)) {
       return _sockets[uri];
     }
-    final socket = await _connect(uri, timeout);
+    final socket = await _connect(uri!, timeout);
     socket.setOption(SocketOption.tcpNoDelay, noDelay);
     socket.listen(_receive(uri, socket), onError: (error) {
       _close(uri, socket, error);
@@ -144,15 +144,15 @@ class TcpTransport implements Transport {
     final uri = clientContext.uri;
     final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
     final result = Completer<Uint8List>();
-    final socket = await _getSocket(uri, clientContext.timeout);
+    final socket = await (_getSocket(uri, clientContext.timeout) as FutureOr<Socket>);
     if (!_results.containsKey(socket)) {
       _results[socket] = {};
     }
-    final results = _results[socket];
+    final results = _results[socket]!;
     results[index] = result;
-    Timer timer;
-    if (clientContext.timeout > Duration.zero) {
-      timer = Timer(clientContext.timeout, () async {
+    Timer? timer;
+    if (clientContext.timeout! > Duration.zero) {
+      timer = Timer(clientContext.timeout!, () async {
         if (!result.isCompleted) {
           result.completeError(TimeoutException('Timeout'));
           await abort();
@@ -187,7 +187,7 @@ class TcpTransport implements Transport {
 
 class TcpTransportCreator implements TransportCreator<TcpTransport> {
   @override
-  List<String> schemes = [
+  List<String>? schemes = [
     'tcp',
     'tcp4',
     'tcp6',

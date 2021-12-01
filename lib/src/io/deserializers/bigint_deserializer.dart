@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class BigIntDeserializer extends BaseDeserializer<BigInt> {
-  static final AbstractDeserializer<BigInt> instance = BigIntDeserializer();
+  static final AbstractDeserializer<BigInt?> instance = BigIntDeserializer();
   @override
-  BigInt read(Reader reader, int tag) {
+  BigInt? read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {
       return BigInt.from(tag - 0x30);
     }
@@ -26,9 +26,9 @@ class BigIntDeserializer extends BaseDeserializer<BigInt> {
     switch (tag) {
       case TagInteger:
       case TagLong:
-        return BigInt.from(ValueReader.readInt(stream));
+        return BigInt.from(ValueReader.readInt(stream!));
       case TagDouble:
-        return BigInt.from(ValueReader.readDouble(stream));
+        return BigInt.from(ValueReader.readDouble(stream!));
       case TagTrue:
         return BigInt.one;
       case TagFalse:
@@ -37,7 +37,7 @@ class BigIntDeserializer extends BaseDeserializer<BigInt> {
       case TagString:
         return BigInt.parse(ReferenceReader.readString(reader));
       case TagUTF8Char:
-        return BigInt.from(stream.readString(1).codeUnitAt(1));
+        return BigInt.from(stream!.readString(1).codeUnitAt(1));
       case TagDate:
         return BigInt.from(
             ReferenceReader.readDateTime(reader).millisecondsSinceEpoch);

@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class DoubleDeserializer extends BaseDeserializer<double> {
-  static final AbstractDeserializer<double> instance = DoubleDeserializer();
+  static final AbstractDeserializer<double?> instance = DoubleDeserializer();
   @override
-  double read(Reader reader, int tag) {
+  double? read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {
       return (tag - 0x30).toDouble();
     }
@@ -26,22 +26,22 @@ class DoubleDeserializer extends BaseDeserializer<double> {
     switch (tag) {
       case TagInteger:
       case TagLong:
-        return ValueReader.readInt(stream).toDouble();
+        return ValueReader.readInt(stream!).toDouble();
       case TagDouble:
-        return ValueReader.readDouble(stream);
+        return ValueReader.readDouble(stream!);
       case TagNaN:
         return double.nan;
       case TagInfinity:
-        return ValueReader.readInfinity(stream);
+        return ValueReader.readInfinity(stream!);
       case TagTrue:
         return 1;
       case TagFalse:
       case TagEmpty:
         return 0;
       case TagString:
-        return num.parse(ReferenceReader.readString(reader));
+        return num.parse(ReferenceReader.readString(reader)) as double?;
       case TagUTF8Char:
-        return stream.readString(1).codeUnitAt(1).toDouble();
+        return stream!.readString(1).codeUnitAt(1).toDouble();
       case TagDate:
         return ReferenceReader.readDateTime(reader)
             .millisecondsSinceEpoch

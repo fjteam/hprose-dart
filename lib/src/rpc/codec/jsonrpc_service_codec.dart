@@ -76,7 +76,7 @@ class JsonRpcServiceCodec implements ServiceCodec {
     } else {
       response['result'] = result;
     }
-    return utf8.encode(json.encode(response));
+    return utf8.encode(json.encode(response)) as Uint8List;
   }
 
   @override

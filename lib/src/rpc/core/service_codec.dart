@@ -17,7 +17,7 @@ part of hprose.rpc.core;
 
 class RequestInfo {
   final String name;
-  final List args;
+  final List? args;
   RequestInfo(this.name, this.args);
 }
 
@@ -69,8 +69,8 @@ class DefaultServiceCodec extends ServiceCodec {
     return method;
   }
 
-  List _decodeArguments(Method method, Reader reader) {
-    final stream = reader.stream;
+  List? _decodeArguments(Method method, Reader reader) {
+    final stream = reader.stream!;
     var tag = stream.readByte();
     if (method.missing) {
       if (tag == TagList) {
@@ -106,10 +106,10 @@ class DefaultServiceCodec extends ServiceCodec {
     n = min(count, n);
     for (var i = 0; i < n; ++i) {
       if (i < ppl) {
-        args[i] = Deserializer.get(method.positionalParameterTypes[i])
+        args[i] = Deserializer.get(method.positionalParameterTypes[i])!
             .deserialize(reader);
       } else if (method.hasOptionalArguments) {
-        args[i] = Deserializer.get(method.optionalParameterTypes[i - ppl])
+        args[i] = Deserializer.get(method.optionalParameterTypes[i - ppl])!
             .deserialize(reader);
       }
       if (i == ppl && method.hasNamedArguments) {
@@ -124,7 +124,7 @@ class DefaultServiceCodec extends ServiceCodec {
         for (var j = 0; j < size; ++j) {
           var name = reader.deserialize<String>();
           if (method.namedParameterTypes.containsKey(name)) {
-            var value = Deserializer.get(method.namedParameterTypes[name])
+            var value = Deserializer.get(method.namedParameterTypes[name!])!
                 .deserialize(reader);
             namedArgs[Symbol(name)] = value;
           } else {
@@ -149,7 +149,7 @@ class DefaultServiceCodec extends ServiceCodec {
     reader.longType = longType;
     var tag = stream.readByte();
     if (tag == TagHeader) {
-      final headers = reader.deserialize<Map<String, dynamic>>();
+      final headers = reader.deserialize<Map<String, dynamic>>()!;
       context.requestHeaders.addAll(headers);
       reader.reset();
       tag = stream.readByte();
@@ -159,7 +159,7 @@ class DefaultServiceCodec extends ServiceCodec {
         if (context.requestHeaders.containsKey('simple')) {
           reader.simple = true;
         }
-        final name = reader.deserialize<String>();
+        final name = reader.deserialize<String>()!;
         final args = _decodeArguments(_decodeMethod(name, context), reader);
         return RequestInfo(name, args);
       case TagEnd:

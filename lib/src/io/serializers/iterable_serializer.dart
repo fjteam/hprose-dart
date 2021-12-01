@@ -15,14 +15,14 @@
 
 part of hprose.io;
 
-class IterableSerializer<E> extends ReferenceSerializer<Iterable<E>> {
+class IterableSerializer<E> extends ReferenceSerializer<Iterable<E>?> {
   static final AbstractSerializer instance = IterableSerializer();
   @override
-  void write(Writer writer, Iterable<E> value) {
+  void write(Writer writer, Iterable<E>? value) {
     super.write(writer, value);
     final stream = writer.stream;
     stream.writeByte(TagList);
-    final n = value.length;
+    final n = value!.length;
     if (n > 0) stream.writeAsciiString(n.toString());
     stream.writeByte(TagOpenbrace);
     var serializer = Serializer.getInstance<E>(value.first);

@@ -16,5 +16,5 @@
 part of hprose.io;
 
 class FunctionDeserializer extends BaseDeserializer<Function> {
-  static final AbstractDeserializer<Function> instance = FunctionDeserializer();
+  static final AbstractDeserializer<Function?> instance = FunctionDeserializer();
 }

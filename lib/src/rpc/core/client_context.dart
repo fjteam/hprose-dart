@@ -16,16 +16,16 @@
 part of hprose.rpc.core;
 
 class ClientContext extends Context {
-  Client client;
-  Uri uri;
-  Type returnType;
-  Duration timeout;
+  Client? client;
+  Uri? uri;
+  Type? returnType;
+  Duration? timeout;
   ClientContext(
       {this.uri,
       this.returnType,
       this.timeout,
-      Map<String, dynamic> requestHeaders,
-      Map<String, dynamic> items}) {
+      Map<String, dynamic>? requestHeaders,
+      Map<String, dynamic>? items}) {
     if (requestHeaders != null && requestHeaders.isNotEmpty) {
       this.requestHeaders.addAll(requestHeaders);
     }
@@ -33,7 +33,7 @@ class ClientContext extends Context {
       this.items.addAll(items);
     }
   }
-  void init(Client client, [Type type]) {
+  void init(Client client, [Type? type]) {
     this.client = client;
     if (client.uris.isNotEmpty) uri = client.uris.first;
     returnType ??= type;

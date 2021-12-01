@@ -21,9 +21,9 @@ class HttpTransport implements Transport {
   var _counter = 0;
   final _requests = <int, HttpRequest>{};
   var httpRequestHeaders = <String, Object>{};
-  OnProgress onProgress;
+  OnProgress? onProgress;
   void _setRequestHeader(
-      HttpRequest httpRequest, Map<String, Object> httpRequestHeaders) {
+      HttpRequest httpRequest, Map<String, Object>? httpRequestHeaders) {
     httpRequestHeaders?.forEach((String name, Object values) {
       if (values is List) {
         httpRequest.setRequestHeader(name, values.join(', '));
@@ -67,7 +67,7 @@ class HttpTransport implements Transport {
     httpRequest.onLoad.listen((e) {
       context['httpStatusCode'] = httpRequest.status;
       context['httpStatusText'] = httpRequest.statusText;
-      if (httpRequest.status >= 200 && httpRequest.status < 300) {
+      if (httpRequest.status! >= 200 && httpRequest.status! < 300) {
         context['httpResponseHeaders'] =
             _getResponseHeader(httpRequest.responseHeaders);
         result.complete(Uint8List.view(httpRequest.response));
@@ -114,7 +114,7 @@ class HttpTransport implements Transport {
 
 class HttpTransportCreator implements TransportCreator<HttpTransport> {
   @override
-  List<String> schemes = ['http', 'https'];
+  List<String>? schemes = ['http', 'https'];
 
   @override
   HttpTransport create() {

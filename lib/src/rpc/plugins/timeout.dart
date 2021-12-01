@@ -26,11 +26,11 @@ class Timeout {
       String name, List args, Context context, NextInvokeHandler next) async {
     final task = next(name, args, context);
     final serviceContext = context as ServiceContext;
-    var timeout = this.timeout;
-    if (serviceContext.method.options.containsKey('timeout')) {
-      timeout = serviceContext.method.options['timeout'];
+    Duration? timeout = this.timeout;
+    if (serviceContext.method!.options.containsKey('timeout')) {
+      timeout = serviceContext.method!.options['timeout'];
     }
-    if (timeout <= Duration.zero) {
+    if (timeout! <= Duration.zero) {
       return await task;
     }
     var completer = Completer();

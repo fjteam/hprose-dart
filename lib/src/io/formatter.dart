@@ -23,8 +23,8 @@ class Formatter {
     return stream.bytes;
   }
 
-  static T deserialize<T>(dynamic data, {bool simple = false, String type}) {
-    ByteStream stream;
+  static T? deserialize<T>(dynamic data, {bool simple = false, String? type}) {
+    ByteStream? stream;
     if (data is ByteStream) {
       stream = data;
     } else if (data is Uint8List) {
@@ -40,7 +40,7 @@ class Formatter {
     if (type == null) {
       return reader.deserialize<T>();
     } else {
-      return Deserializer.get(type).deserialize(reader);
+      return Deserializer.get(type)!.deserialize(reader);
     }
   }
 }

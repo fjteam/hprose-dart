@@ -18,14 +18,14 @@ part of hprose.rpc.browser;
 class WebSocketTransport implements Transport {
   var _counter = 0;
   final _results = <WebSocket, Map<int, Completer<Uint8List>>>{};
-  final _sockets = <Uri, WebSocket>{};
+  final _sockets = <Uri?, WebSocket>{};
 
-  void _close(Uri uri, WebSocket socket, Object error) async {
+  void _close(Uri? uri, WebSocket socket, Object error) async {
     if (_sockets.containsKey(uri) && _sockets[uri] == socket) {
       _sockets.remove(uri);
     }
     if (_results.containsKey(socket)) {
-      var results = _results.remove(socket);
+      var results = _results.remove(socket)!;
       for (var result in results.values) {
         if (!result.isCompleted) {
           result.completeError(error);
@@ -34,7 +34,7 @@ class WebSocketTransport implements Transport {
     }
   }
 
-  Future<WebSocket> _getSocket(Uri uri) async {
+  Future<WebSocket?> _getSocket(Uri? uri) async {
     if (_sockets.containsKey(uri)) {
       return _sockets[uri];
     }
@@ -47,7 +47,7 @@ class WebSocketTransport implements Transport {
       final has_error = (index & 0x80000000) != 0;
       index &= 0x7FFFFFFF;
       if (_results.containsKey(socket)) {
-        final results = _results[socket];
+        final results = _results[socket]!;
         final result = results.remove(index);
         if (has_error) {
           if (result != null && !result.isCompleted) {
@@ -75,15 +75,15 @@ class WebSocketTransport implements Transport {
     final uri = clientContext.uri;
     final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
     final result = Completer<Uint8List>();
-    final socket = await _getSocket(uri);
+    final socket = await (_getSocket(uri) as FutureOr<WebSocket>);
     if (!_results.containsKey(socket)) {
       _results[socket] = {};
     }
-    final results = _results[socket];
+    final results = _results[socket]!;
     results[index] = result;
-    Timer timer;
-    if (clientContext.timeout > Duration.zero) {
-      timer = Timer(clientContext.timeout, () {
+    Timer? timer;
+    if (clientContext.timeout! > Duration.zero) {
+      timer = Timer(clientContext.timeout!, () {
         if (!result.isCompleted) {
           result.completeError(TimeoutException('Timeout'));
           abort();
@@ -117,7 +117,7 @@ class WebSocketTransport implements Transport {
 class WebSocketTransportCreator
     implements TransportCreator<WebSocketTransport> {
   @override
-  List<String> schemes = ['ws', 'wss'];
+  List<String>? schemes = ['ws', 'wss'];
 
   @override
   WebSocketTransport create() {

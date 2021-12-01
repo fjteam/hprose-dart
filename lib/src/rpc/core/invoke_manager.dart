@@ -16,9 +16,9 @@
 part of hprose.rpc.core;
 
 typedef NextInvokeHandler = Future Function(
-    String name, List args, Context context);
+    String name, List? args, Context context);
 typedef InvokeHandler = Future Function(
-    String name, List args, Context context, NextInvokeHandler next);
+    String name, List? args, Context context, NextInvokeHandler next);
 
 class InvokeManager extends PluginManager<InvokeHandler, NextInvokeHandler> {
   InvokeManager(NextInvokeHandler defaultHandler) : super(defaultHandler);

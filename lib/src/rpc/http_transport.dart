@@ -16,7 +16,7 @@
 part of hprose.rpc;
 
 class HttpTransport implements Transport {
-  HttpClient httpClient;
+  late HttpClient httpClient;
   bool keepAlive = true;
   int maxConnectionsPerHost = 0;
   var httpRequestHeaders = <String, Object>{};
@@ -36,22 +36,22 @@ class HttpTransport implements Transport {
   @override
   Future<Uint8List> transport(Uint8List request, Context context) async {
     final clientContext = context as ClientContext;
-    if (clientContext.timeout > Duration.zero) {
+    if (clientContext.timeout! > Duration.zero) {
       httpClient.connectionTimeout = clientContext.timeout;
     }
-    final httpRequest = await httpClient.postUrl(clientContext.uri);
+    final httpRequest = await httpClient.postUrl(clientContext.uri!);
     httpRequestHeaders.forEach(httpRequest.headers.add);
     if (context.containsKey('httpRequestHeaders')) {
-      (context['httpRequestHeaders'] as Map<String, Object>)
+      (context['httpRequestHeaders'] as Map<String, Object>?)
           ?.forEach(httpRequest.headers.add);
     }
     httpRequest.persistentConnection = keepAlive;
     httpRequest.contentLength = request.length;
     httpRequest.add(request);
     HttpClientResponse httpResponse;
-    if (clientContext.timeout > Duration.zero) {
+    if (clientContext.timeout! > Duration.zero) {
       var completer = Completer<HttpClientResponse>();
-      var timer = Timer(clientContext.timeout, () async {
+      var timer = Timer(clientContext.timeout!, () async {
         if (!completer.isCompleted) {
           completer.completeError(TimeoutException('Timeout'));
           await abort();
@@ -97,7 +97,7 @@ class HttpTransport implements Transport {
 
 class HttpTransportCreator implements TransportCreator<HttpTransport> {
   @override
-  List<String> schemes = ['http', 'https'];
+  List<String>? schemes = ['http', 'https'];
 
   @override
   HttpTransport create() {

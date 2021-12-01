@@ -18,7 +18,7 @@ part of hprose.io;
 class DynamicObjectDeserializer extends BaseDeserializer<DynamicObject> {
   static final AbstractDeserializer instance = DynamicObjectDeserializer();
   @override
-  DynamicObject read(Reader reader, int tag) {
+  DynamicObject? read(Reader reader, int tag) {
     switch (tag) {
       case TagMap:
         return ReferenceReader.readMapAsDynamicObject(reader);

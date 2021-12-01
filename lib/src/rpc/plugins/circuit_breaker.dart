@@ -30,7 +30,7 @@ class CircuitBreaker {
   int _failCount = 0;
   final int threshold;
   final Duration recoverTime;
-  final MockService mockService;
+  final MockService? mockService;
   CircuitBreaker(
       [this.threshold = 5,
       this.recoverTime = const Duration(seconds: 30),
@@ -64,7 +64,7 @@ class CircuitBreaker {
     try {
       return await next(name, args, context);
     } on BreakerError {
-      return await mockService.invoke(name, args, context);
+      return await mockService!.invoke(name, args, context);
     }
   }
 }

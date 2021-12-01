@@ -38,7 +38,7 @@ class Method {
   bool hasOptionalArguments = false;
   bool hasNamedArguments = false;
   Method(this.method,
-      {this.name, this.missing = false, this.options = const {}}) {
+      {required this.name, this.missing = false, this.options = const {}}) {
     if (name == null || name.isEmpty) {
       name = _getFunctionName(method);
     }
@@ -80,7 +80,7 @@ class Method {
     return str.substring(0, n);
   }
 
-  void _parseNamedParameters(List<String> genericsArguments, String str) {
+  void _parseNamedParameters(List<String>? genericsArguments, String str) {
     var nesting = 0;
     var p = 0;
     String type;
@@ -116,7 +116,7 @@ class Method {
 
   void _parseParameters(Function func) {
     var str = func.runtimeType.toString();
-    List<String> genericsArguments;
+    List<String>? genericsArguments;
     var p = -1;
     if (str.startsWith('<')) {
       p = str.indexOf('>(');
@@ -158,7 +158,7 @@ class Method {
   }
 
   void _replaceGenericsArguments(
-      List<String> genericsArguments, List<String> types) {
+      List<String>? genericsArguments, List<String> types) {
     genericsArguments?.forEach((a) {
       var n = types.length;
       for (var i = 0; i < n; i++) {

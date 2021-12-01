@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class NumDeserializer extends BaseDeserializer<num> {
-  static final AbstractDeserializer<num> instance = NumDeserializer();
+  static final AbstractDeserializer<num?> instance = NumDeserializer();
   @override
-  num read(Reader reader, int tag) {
+  num? read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {
       return tag - 0x30;
     }
@@ -26,13 +26,13 @@ class NumDeserializer extends BaseDeserializer<num> {
     switch (tag) {
       case TagInteger:
       case TagLong:
-        return ValueReader.readInt(stream);
+        return ValueReader.readInt(stream!);
       case TagDouble:
-        return ValueReader.readDouble(stream);
+        return ValueReader.readDouble(stream!);
       case TagNaN:
         return double.nan;
       case TagInfinity:
-        return ValueReader.readInfinity(stream);
+        return ValueReader.readInfinity(stream!);
       case TagTrue:
         return 1;
       case TagFalse:
@@ -41,7 +41,7 @@ class NumDeserializer extends BaseDeserializer<num> {
       case TagString:
         return num.parse(ReferenceReader.readString(reader));
       case TagUTF8Char:
-        return stream.readString(1).codeUnitAt(1);
+        return stream!.readString(1).codeUnitAt(1);
       case TagDate:
         return ReferenceReader.readDateTime(reader).millisecondsSinceEpoch;
       case TagTime:

@@ -16,9 +16,9 @@
 part of hprose.rpc;
 
 class WebSocketHandler extends HttpHandler {
-  void Function(WebSocket socket) onAccept;
-  void Function(WebSocket socket, dynamic error) onWebSocketError;
-  void Function(WebSocket socket) onClose;
+  void Function(WebSocket socket)? onAccept;
+  late void Function(WebSocket socket, dynamic error) onWebSocketError;
+  void Function(WebSocket socket)? onClose;
 
   WebSocketHandler(core.Service service) : super(service);
 
@@ -30,11 +30,11 @@ class WebSocketHandler extends HttpHandler {
     }
     final socket = await WebSocketTransformer.upgrade(request);
     try {
-      if (onAccept != null) onAccept(socket);
+      if (onAccept != null) onAccept!(socket);
     } catch (e) {
       if (onError != null) onWebSocketError(socket, e);
       await socket.close();
-      if (onClose != null) onClose(socket);
+      if (onClose != null) onClose!(socket);
       return;
     }
     socket.listen((data) async {
@@ -58,14 +58,14 @@ class WebSocketHandler extends HttpHandler {
     }, onError: (dynamic error) {
       if (onError != null) onWebSocketError(socket, error);
     }, onDone: () {
-      if (onClose != null) onClose(socket);
+      if (onClose != null) onClose!(socket);
     }, cancelOnError: true);
   }
 }
 
 class WebSocketHandlerCreator implements HandlerCreator<WebSocketHandler> {
   @override
-  List<String> serverTypes = ['_HttpServer'];
+  List<String>? serverTypes = ['_HttpServer'];
 
   @override
   WebSocketHandler create(core.Service service) {

@@ -25,9 +25,9 @@ class Client extends core.Client {
     return core.Client.isRegister(name);
   }
 
-  Client([List<String> uris]) : super(uris);
-  HttpTransport get http => this['http'];
-  WebSocketTransport get websocket => this['websocket'];
+  Client([List<String>? uris]) : super(uris);
+  HttpTransport? get http => this['http'] as HttpTransport?;
+  WebSocketTransport? get websocket => this['websocket'] as WebSocketTransport?;
 
   @override
   void init() {

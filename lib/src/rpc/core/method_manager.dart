@@ -23,7 +23,7 @@ class MethodManager {
   final List<String> _names = [];
   final Map<String, Method> _methods = {};
   Iterable<String> getNames() => _names;
-  Method get(String name) {
+  Method? get(String name) {
     name = name.toLowerCase();
     return _methods.containsKey(name) ? _methods[name] : _methods['*'];
   }
@@ -45,7 +45,7 @@ class MethodManager {
     add(Method(method, name: name));
   }
 
-  void addMethods(List<Function> _methods, [List<String> names]) {
+  void addMethods(List<Function> _methods, [List<String>? names]) {
     if (names != null) {
       for (var i = 0; i < _methods.length; ++i) {
         add(Method(_methods[i], name: names[i]));

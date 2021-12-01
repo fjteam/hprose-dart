@@ -17,9 +17,9 @@ part of hprose.rpc.plugins;
 
 class Message {
   dynamic data;
-  String from;
+  String? from;
   Message(this.data, this.from);
-  factory Message.FromJson(Map<String, dynamic> json) =>
+  factory Message.FromJson(Map<String?, dynamic> json) =>
       Message(json['data'], json['from']);
   Map<String, dynamic> toJson() => {'data': data, 'from': from};
 }
@@ -36,8 +36,8 @@ class Producer {
       _broker.broadcast(data, topic, from);
   dynamic push(dynamic data, String topic, [dynamic id]) =>
       _broker.push(data, topic, id);
-  void deny([String id, String topic]) => _broker.deny(id ?? from, topic);
-  bool exists(String topic, [String id]) => _broker.exists(topic, id ?? from);
+  void deny([String? id, String? topic]) => _broker.deny(id ?? from, topic);
+  bool exists(String topic, [String? id]) => _broker.exists(topic, id ?? from);
   List<String> idlist(String topic) => _broker.idlist(topic);
 }
 
@@ -50,15 +50,15 @@ class BrokerContext extends ServiceContext {
 }
 
 class Broker {
-  final _messages = <String, Map<String, List<Message>>>{};
+  final _messages = <String, Map<String, List<Message>?>>{};
   final _responders = <String, Completer<Map<String, List<Message>>>>{};
   final _timers = <String, Completer<bool>>{};
   Service service;
   Duration timeout = const Duration(minutes: 2);
   Duration heartbeat = const Duration(seconds: 10);
-  void Function(String id, String topic, ServiceContext context) onSubscribe;
+  void Function(String id, String topic, ServiceContext context)? onSubscribe;
   void Function(String id, String topic, List<Message> messages,
-      ServiceContext context) onUnsubscribe;
+      ServiceContext context)? onUnsubscribe;
   Broker(this.service) {
     if (!TypeManager.isRegister('@')) {
       TypeManager.register<Message>((json) => Message.FromJson(json),
@@ -76,17 +76,17 @@ class Broker {
       ..addMethod(idlist, '|')
       ..use(_handler);
   }
-  bool _send(String id, Completer<Map<String, List<Message>>> responder) {
+  bool _send(String id, Completer<Map<String, List<Message>?>> responder) {
     if (!_messages.containsKey(id)) {
       responder.complete(null);
       return true;
     }
-    final topics = _messages[id];
+    final topics = _messages[id]!;
     if (topics.isEmpty) {
       responder.complete(null);
       return true;
     }
-    final result = <String, List<Message>>{};
+    final result = <String, List<Message>?>{};
     for (final topic in topics.entries) {
       final name = topic.key;
       final messages = topic.value;
@@ -108,8 +108,8 @@ class Broker {
   void _doHeartbeat(String id) {
     if (heartbeat <= Duration.zero) return;
     var timer = Completer<bool>();
-    if (_timers.containsKey(id) && !_timers[id].isCompleted) {
-      _timers[id].complete(false);
+    if (_timers.containsKey(id) && !_timers[id]!.isCompleted) {
+      _timers[id]!.complete(false);
     }
     _timers[id] = timer;
     var heartbeatTimer = Timer(heartbeat, () {
@@ -120,7 +120,7 @@ class Broker {
     timer.future.then((value) {
       heartbeatTimer.cancel();
       if (value && _messages.containsKey(id)) {
-        final topics = _messages[id];
+        final topics = _messages[id]!;
         for (final topic in topics.keys) {
           _offline(topics, id, topic, service.createContext());
         }
@@ -140,12 +140,12 @@ class Broker {
     if (!_messages.containsKey(id)) {
       _messages[id] = {};
     }
-    if (_messages[id].containsKey(topic)) {
+    if (_messages[id]!.containsKey(topic)) {
       return false;
     }
-    _messages[id][topic] = [];
+    _messages[id]![topic] = [];
     if (onSubscribe != null) {
-      onSubscribe(id, topic, context);
+      onSubscribe!(id, topic, context);
     }
     return true;
   }
@@ -161,12 +161,12 @@ class Broker {
     }
   }
 
-  bool _offline(Map<String, List<Message>> topics, String id, String topic,
+  bool _offline(Map<String, List<Message>?> topics, String id, String topic,
       ServiceContext context) {
     final messages = topics.remove(topic);
     if (messages != null) {
       if (onUnsubscribe != null) {
-        onUnsubscribe(id, topic, messages, context);
+        onUnsubscribe!(id, topic, messages, context);
       }
       _response(id);
       return true;
@@ -177,7 +177,7 @@ class Broker {
   bool _unsubscribe(String topic, ServiceContext context) {
     final id = _getId(context);
     if (_messages.containsKey(id)) {
-      return _offline(_messages[id], id, topic, context);
+      return _offline(_messages[id]!, id, topic, context);
     }
     return false;
   }
@@ -189,7 +189,7 @@ class Broker {
       responder.complete(null);
     }
     if (_timers.containsKey(id)) {
-      final timer = _timers.remove(id);
+      final timer = _timers.remove(id)!;
       if (!timer.isCompleted) {
         timer.complete(false);
       }
@@ -201,7 +201,7 @@ class Broker {
         var timeoutTimer = Timer(timeout, () {
           if (_responders[id] == responder) {
             _responders.remove(id);
-            responder.complete({});
+            responder!.complete({});
           }
           _doHeartbeat(id);
         });
@@ -214,8 +214,8 @@ class Broker {
   }
 
   bool unicast(dynamic data, String topic, String id, [String from = '']) {
-    if (_messages.containsKey(id) && _messages[id].containsKey(topic)) {
-      final messages = _messages[id][topic];
+    if (_messages.containsKey(id) && _messages[id]!.containsKey(topic)) {
+      final messages = _messages[id]![topic]!;
       messages.add(Message(data, from));
       _response(id);
       return true;
@@ -235,8 +235,8 @@ class Broker {
   Map<String, bool> broadcast(dynamic data, String topic, [String from = '']) {
     final result = <String, bool>{};
     for (final id in _messages.keys) {
-      if (_messages[id].containsKey(topic)) {
-        final messages = _messages[id][topic];
+      if (_messages[id]!.containsKey(topic)) {
+        final messages = _messages[id]![topic]!;
         messages.add(Message(data, from));
         _response(id);
         result[id] = true;
@@ -255,15 +255,15 @@ class Broker {
     return multicast(data, topic, id, from);
   }
 
-  void deny(String id, [String topic]) {
+  void deny(String id, [String? topic]) {
     if (_messages.containsKey(id)) {
       if (topic != null && topic.isNotEmpty) {
-        if (_messages[id].containsKey(topic)) {
-          _messages[id][topic] = null;
+        if (_messages[id]!.containsKey(topic)) {
+          _messages[id]![topic] = null;
         }
       } else {
-        for (final topic in _messages[id].keys) {
-          _messages[id][topic] = null;
+        for (final topic in _messages[id]!.keys) {
+          _messages[id]![topic] = null;
         }
       }
       _response(id);
@@ -272,14 +272,14 @@ class Broker {
 
   bool exists(String topic, String id) {
     return _messages.containsKey(id) &&
-        _messages[id].containsKey(topic) &&
-        _messages[id][topic] != null;
+        _messages[id]!.containsKey(topic) &&
+        _messages[id]![topic] != null;
   }
 
   List<String> idlist(String topic) {
     final idlist = <String>[];
     for (final id in _messages.keys) {
-      if (_messages[id].containsKey(topic) && _messages[id][topic] != null) {
+      if (_messages[id]!.containsKey(topic) && _messages[id]![topic] != null) {
         idlist.add(id);
       }
     }
@@ -309,9 +309,9 @@ class Prosumer {
   final Map<String, void Function(Message message)> _callbacks = {};
   final Client client;
   var retryInterval = Duration(seconds: 1);
-  void Function(dynamic error) onError;
-  void Function(String topic) onSubscribe;
-  void Function(String topic) onUnsubscribe;
+  void Function(dynamic error)? onError;
+  void Function(String topic)? onSubscribe;
+  void Function(String topic)? onUnsubscribe;
   String get id {
     if (client.requestHeaders.containsKey('id')) {
       return client.requestHeaders['id'].toString();
@@ -323,7 +323,7 @@ class Prosumer {
     client.requestHeaders['id'] = value;
   }
 
-  Prosumer(this.client, [String id]) {
+  Prosumer(this.client, [String? id]) {
     if (!TypeManager.isRegister('@')) {
       TypeManager.register<Message>((json) => Message.FromJson(json),
           {'data': dynamic, 'from': String}, '@');
@@ -350,7 +350,7 @@ class Prosumer {
                 callback(messages[i]);
               } catch (e) {
                 if (onError != null) {
-                  onError(e);
+                  onError!(e);
                 }
               }
             });
@@ -358,7 +358,7 @@ class Prosumer {
         } else {
           _callbacks.remove(topic);
           if (onUnsubscribe != null) {
-            onUnsubscribe(topic);
+            onUnsubscribe!(topic);
           }
         }
       }
@@ -382,7 +382,7 @@ class Prosumer {
             await Future.delayed(retryInterval);
           }
           if (onError != null) {
-            onError(e);
+            onError!(e);
           }
         }
         err = null;
@@ -398,42 +398,42 @@ class Prosumer {
     }
   }
 
-  Future<bool> subscribe(
+  Future<bool?> subscribe(
       String topic, void Function(Message message) callback) async {
     if (id.isNotEmpty) {
       _callbacks[topic] = callback;
       final result = await client.invoke<bool>('+', [topic]);
       _message();
       if (onSubscribe != null) {
-        onSubscribe(topic);
+        onSubscribe!(topic);
       }
       return result;
     }
     return false;
   }
 
-  Future<bool> unsubscribe(String topic) async {
+  Future<bool?> unsubscribe(String topic) async {
     if (id.isNotEmpty) {
       final result = await client.invoke<bool>('-', [topic]);
       _callbacks.remove(topic);
       if (onUnsubscribe != null) {
-        onUnsubscribe(topic);
+        onUnsubscribe!(topic);
       }
       return result;
     }
     return false;
   }
 
-  Future<bool> unicast(dynamic data, String topic, String id) {
+  Future<bool?> unicast(dynamic data, String topic, String id) {
     return client.invoke<bool>('>', [data, topic, id]);
   }
 
-  Future<Map<String, bool>> multicast(
+  Future<Map<String, bool>?> multicast(
       dynamic data, String topic, List<String> ids) {
     return client.invoke<Map<String, bool>>('>?', [data, topic, ids]);
   }
 
-  Future<Map<String, bool>> broadcast(dynamic data, String topic) {
+  Future<Map<String, bool>?> broadcast(dynamic data, String topic) {
     return client.invoke<Map<String, bool>>('>*', [data, topic]);
   }
 
@@ -447,14 +447,14 @@ class Prosumer {
     return multicast(data, topic, id);
   }
 
-  Future<bool> exists(String topic, [String id]) {
+  Future<bool?> exists(String topic, [String? id]) {
     if (id == null || id.isEmpty) {
       id = this.id;
     }
     return client.invoke<bool>('?', [topic, id]);
   }
 
-  Future<List<String>> idlist(String topic) {
+  Future<List<String>?> idlist(String topic) {
     return client.invoke<List<String>>('|', [topic]);
   }
 }

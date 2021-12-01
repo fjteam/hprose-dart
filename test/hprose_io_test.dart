@@ -89,7 +89,7 @@ void main() {
     final list = [0, 1.2, 3.4, 5.6, "hello", byteList, doubleList];
     final stream = ByteStream();
     final writer = Writer(stream);
-    writer.serialize<DynamicObject>(null);
+    writer.serialize<DynamicObject?>(null);
     writer.serialize(byteList);
     writer.serialize(doubleList);
     writer.serialize(list);
@@ -291,11 +291,11 @@ void main() {
 }
 
 class User {
-  String name;
-  int age;
-  bool male;
+  String? name;
+  int? age;
+  bool? male;
   User([this.name, this.age, this.male]);
-  factory User.fromJson(Map<String, dynamic> json) {
+  factory User.fromJson(Map<String?, dynamic> json) {
     return User(json['name'], json['age'], json['male']);
   }
   Map<String, dynamic> toJson() =>

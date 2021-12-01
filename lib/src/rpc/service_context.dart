@@ -16,10 +16,10 @@
 part of hprose.rpc;
 
 class ServiceContext extends core.ServiceContext {
-  InternetAddress remoteAddress;
-  int remotePort;
-  InternetAddress localAddress;
-  int localPort;
+  InternetAddress? remoteAddress;
+  int? remotePort;
+  InternetAddress? localAddress;
+  int? localPort;
   ServiceContext(Service service) : super(service);
 
   @override

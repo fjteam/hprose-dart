@@ -40,8 +40,8 @@ class ByteStream {
         : Uint8List(_pow2roundup(initialCapacity));
   }
 
-  ByteStream.fromByteBuffer(ByteBuffer buffer,
-      [int offsetInBytes = 0, int length]) {
+  ByteStream.fromByteBuffer(ByteBuffer? buffer,
+      [int offsetInBytes = 0, int? length]) {
     _buffer = (buffer == null)
         ? _emptyList
         : buffer.asUint8List(offsetInBytes, length);
@@ -54,7 +54,7 @@ class ByteStream {
     mark();
   }
 
-  ByteStream.fromUint8List(Uint8List list) {
+  ByteStream.fromUint8List(Uint8List? list) {
     _buffer = (list == null) ? _emptyList : list;
     _size = _buffer.length;
     mark();

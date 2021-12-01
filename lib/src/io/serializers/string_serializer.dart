@@ -15,20 +15,20 @@
 
 part of hprose.io;
 
-class StringSerializer extends ReferenceSerializer<String> {
-  static final AbstractSerializer<String> instance = StringSerializer();
+class StringSerializer extends ReferenceSerializer<String?> {
+  static final AbstractSerializer<String?> instance = StringSerializer();
   @override
-  void write(Writer writer, String value) {
+  void write(Writer writer, String? value) {
     super.write(writer, value);
     final stream = writer.stream;
     stream.writeByte(TagString);
-    ValueWriter.writeStringBody(stream, value);
+    ValueWriter.writeStringBody(stream, value!);
   }
 
   @override
-  void serialize(Writer writer, String value) {
+  void serialize(Writer writer, String? value) {
     final stream = writer.stream;
-    switch (value.length) {
+    switch (value!.length) {
       case 0:
         stream.writeByte(TagEmpty);
         break;

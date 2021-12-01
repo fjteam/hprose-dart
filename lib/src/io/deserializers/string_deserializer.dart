@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class StringDeserializer extends BaseDeserializer<String> {
-  static final AbstractDeserializer<String> instance = StringDeserializer();
+  static final AbstractDeserializer<String?> instance = StringDeserializer();
   @override
-  String read(Reader reader, int tag) {
+  String? read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {
       return String.fromCharCode(tag);
     }
@@ -27,11 +27,11 @@ class StringDeserializer extends BaseDeserializer<String> {
       case TagInteger:
       case TagLong:
       case TagDouble:
-        return stream.readUntil(TagSemicolon);
+        return stream!.readUntil(TagSemicolon);
       case TagNaN:
         return 'NaN';
       case TagInfinity:
-        return ValueReader.readInfinity(stream).toString();
+        return ValueReader.readInfinity(stream!).toString();
       case TagTrue:
         return 'true';
       case TagFalse:
@@ -43,7 +43,7 @@ class StringDeserializer extends BaseDeserializer<String> {
       case TagGuid:
         return ReferenceReader.readGuid(reader);
       case TagUTF8Char:
-        return stream.readString(1);
+        return stream!.readString(1);
       case TagBytes:
         return ReferenceReader.readAsciiString(reader);
       case TagDate:

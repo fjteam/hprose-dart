@@ -25,7 +25,7 @@ class _UdpSocket {
 class UdpTransport implements Transport {
   var _counter = 0;
   final _results = <RawDatagramSocket, Map<int, Completer<Uint8List>>>{};
-  final _sockets = <Uri, _UdpSocket>{};
+  final _sockets = <Uri?, _UdpSocket>{};
   bool Function(X509Certificate certificate) onBadCertificate = (_) => true;
 
   Future<_UdpSocket> _connect(Uri uri) async {
@@ -55,12 +55,12 @@ class UdpTransport implements Transport {
     return _UdpSocket(socket, host, port);
   }
 
-  void _close(Uri uri, RawDatagramSocket socket, Object error) async {
-    if (_sockets.containsKey(uri) && _sockets[uri].socket == socket) {
+  void _close(Uri? uri, RawDatagramSocket socket, Object error) async {
+    if (_sockets.containsKey(uri) && _sockets[uri]!.socket == socket) {
       _sockets.remove(uri);
     }
     if (_results.containsKey(socket)) {
-      var results = _results.remove(socket);
+      var results = _results.remove(socket)!;
       for (var result in results.values) {
         if (!result.isCompleted) {
           result.completeError(error);
@@ -69,7 +69,7 @@ class UdpTransport implements Transport {
     }
   }
 
-  void _receive(Uri uri, RawDatagramSocket socket) {
+  void _receive(Uri? uri, RawDatagramSocket socket) {
     while (true) {
       final datagram = socket.receive();
       if (datagram == null) return;
@@ -86,7 +86,7 @@ class UdpTransport implements Transport {
       index &= 0x7FFF;
       final response = istream.read(bodyLength);
       if (_results.containsKey(socket)) {
-        final results = _results[socket];
+        final results = _results[socket]!;
         final result = results.remove(index);
         if (has_error) {
           if (result != null && !result.isCompleted) {
@@ -101,11 +101,11 @@ class UdpTransport implements Transport {
     }
   }
 
-  Future<_UdpSocket> _getSocket(Uri uri) async {
+  Future<_UdpSocket?> _getSocket(Uri? uri) async {
     if (_sockets.containsKey(uri)) {
       return _sockets[uri];
     }
-    final udp = await _connect(uri);
+    final udp = await _connect(uri!);
     final socket = udp.socket;
     socket.listen((event) {
       if (event == RawSocketEvent.read) {
@@ -126,16 +126,16 @@ class UdpTransport implements Transport {
     final uri = clientContext.uri;
     final index = (_counter < 0x7FFF) ? ++_counter : _counter = 0;
     final result = Completer<Uint8List>();
-    final udp = await _getSocket(uri);
+    final udp = await (_getSocket(uri) as FutureOr<_UdpSocket>);
     final socket = udp.socket;
     if (!_results.containsKey(socket)) {
       _results[socket] = {};
     }
-    final results = _results[socket];
+    final results = _results[socket]!;
     results[index] = result;
-    Timer timer;
-    if (clientContext.timeout > Duration.zero) {
-      timer = Timer(clientContext.timeout, () async {
+    Timer? timer;
+    if (clientContext.timeout! > Duration.zero) {
+      timer = Timer(clientContext.timeout!, () async {
         if (!result.isCompleted) {
           result.completeError(TimeoutException('Timeout'));
           await abort();
@@ -171,7 +171,7 @@ class UdpTransport implements Transport {
 
 class UdpTransportCreator implements TransportCreator<UdpTransport> {
   @override
-  List<String> schemes = ['udp', 'udp4', 'udp6'];
+  List<String>? schemes = ['udp', 'udp4', 'udp6'];
 
   @override
   UdpTransport create() {

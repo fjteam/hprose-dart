@@ -19,20 +19,20 @@ String getAddress(String name, ServiceContext context) {
 }
 
 class User {
-  String name;
-  int age;
-  bool male;
+  String? name;
+  int? age;
+  bool? male;
   User([this.name, this.age, this.male]);
-  factory User.fromJson(Map<String, dynamic> json) {
+  factory User.fromJson(Map<String?, dynamic> json) {
     return User(json['name'], json['age'], json['male']);
   }
   Map<String, dynamic> toJson() =>
       {'name': this.name, 'age': this.age, 'male': this.male};
 }
 
-User createUser(String name, {int age, bool male, Context context}) {
+User createUser(String name, {int? age, bool? male, required Context context}) {
   final serviceContext = context as ServiceContext;
-  print('${serviceContext.remoteAddress.host}:${serviceContext.remotePort}');
+  print('${serviceContext.remoteAddress!.host}:${serviceContext.remotePort}');
   return User(name, age, male);
 }
 
@@ -54,7 +54,7 @@ void main() async {
   final r2 = proxy.sum<int>(1, 2, 3);
   print(await proxy.sum<int>(r1, r2, 3, 4));
   print(await proxy.getAddress<String>('localhost'));
-  User user = await proxy.createUser<User>('张三', age: 18, male: true);
+  User? user = await proxy.createUser<User>('张三', age: 18, male: true);
   print(user);
   server.close();
 }

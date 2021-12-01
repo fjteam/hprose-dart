@@ -25,11 +25,11 @@ class Client extends core.Client {
     return core.Client.isRegister(name);
   }
 
-  Client([List<String> uris]) : super(uris);
-  HttpTransport get http => this['http'];
-  TcpTransport get tcp => this['tcp'];
-  UdpTransport get udp => this['udp'];
-  WebSocketTransport get websocket => this['websocket'];
+  Client([List<String>? uris]) : super(uris);
+  HttpTransport? get http => this['http'] as HttpTransport?;
+  TcpTransport? get tcp => this['tcp'] as TcpTransport?;
+  UdpTransport? get udp => this['udp'] as UdpTransport?;
+  WebSocketTransport? get websocket => this['websocket'] as WebSocketTransport?;
 
   @override
   void init() {

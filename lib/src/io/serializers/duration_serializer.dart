@@ -15,9 +15,9 @@
 
 part of hprose.io;
 
-class DurationSerializer extends BaseSerializer<Duration> {
-  static final AbstractSerializer<Duration> instance = DurationSerializer();
+class DurationSerializer extends BaseSerializer<Duration?> {
+  static final AbstractSerializer<Duration?> instance = DurationSerializer();
   @override
-  void write(Writer writer, Duration value) =>
-      ValueWriter.writeInteger(writer.stream, value.inMicroseconds);
+  void write(Writer writer, Duration? value) =>
+      ValueWriter.writeInteger(writer.stream, value!.inMicroseconds);
 }

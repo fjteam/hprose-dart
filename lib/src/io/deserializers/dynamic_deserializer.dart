@@ -25,19 +25,19 @@ class DynamicDeserializer extends BaseDeserializer {
     final stream = reader.stream;
     switch (tag) {
       case TagInteger:
-        return ValueReader.readInt(stream);
+        return ValueReader.readInt(stream!);
       case TagLong:
         switch (reader.longType) {
           case LongType.Int:
-            return ValueReader.readInt(stream);
+            return ValueReader.readInt(stream!);
           case LongType.BigInt:
-            return BigInt.parse(stream.readUntil(TagSemicolon));
+            return BigInt.parse(stream!.readUntil(TagSemicolon));
           case LongType.String:
-            return stream.readUntil(TagSemicolon);
+            return stream!.readUntil(TagSemicolon);
         }
         break;
       case TagDouble:
-        return ValueReader.readDouble(stream);
+        return ValueReader.readDouble(stream!);
       case TagString:
         return ReferenceReader.readString(reader);
       case TagBytes:
@@ -51,7 +51,7 @@ class DynamicDeserializer extends BaseDeserializer {
       case TagNaN:
         return double.nan;
       case TagInfinity:
-        return ValueReader.readInfinity(stream);
+        return ValueReader.readInfinity(stream!);
       case TagDate:
         return ReferenceReader.readDateTime(reader);
       case TagTime:
@@ -59,7 +59,7 @@ class DynamicDeserializer extends BaseDeserializer {
       case TagGuid:
         return ReferenceReader.readGuid(reader);
       case TagUTF8Char:
-        return stream.readString(1);
+        return stream!.readString(1);
       case TagList:
         return ReferenceReader.readList(reader);
       case TagMap:

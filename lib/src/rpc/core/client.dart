@@ -21,15 +21,15 @@ abstract class Transport {
 }
 
 abstract class TransportCreator<T extends Transport> {
-  List<String> schemes;
+  List<String>? schemes;
   T create();
 }
 
 class _Proxy {
   final Client _client;
-  String _namespace;
+  String? _namespace;
   _Proxy(this._client, this._namespace) {
-    if (_namespace != null && _namespace.isNotEmpty) {
+    if (_namespace != null && _namespace!.isNotEmpty) {
       _namespace += '_';
     } else {
       _namespace = '';
@@ -42,7 +42,7 @@ class _Proxy {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    var name = _namespace + _getName(invocation.memberName);
+    var name = _namespace! + _getName(invocation.memberName);
     if (invocation.isGetter) {
       return _Proxy(_client, name);
     }
@@ -51,7 +51,7 @@ class _Proxy {
       if (invocation.typeArguments.isNotEmpty) {
         type = invocation.typeArguments.first;
       }
-      ClientContext context;
+      ClientContext? context;
       var args = [];
       if (invocation.positionalArguments.isNotEmpty) {
         args.addAll(invocation.positionalArguments);
@@ -85,7 +85,7 @@ class Client {
   static final Map<String, String> _schemes = {};
   static void register<T extends Transport>(
       String name, TransportCreator<T> creator) {
-    var schemes = creator.schemes;
+    var schemes = creator.schemes!;
     _creators[name] = creator;
     for (final scheme in schemes) {
       _schemes[scheme] = name;
@@ -97,9 +97,9 @@ class Client {
   }
 
   final _transports = <String, Transport>{};
-  Transport operator [](String name) => _transports[name];
+  Transport? operator [](String name) => _transports[name];
   void operator []=(String name, Transport value) => _transports[name] = value;
-  MockTransport get mock => _transports['mock'];
+  MockTransport? get mock => _transports['mock'] as MockTransport?;
   final Map<String, dynamic> requestHeaders = {};
   ClientCodec codec = DefaultClientCodec.instance;
   Duration timeout = Duration(seconds: 30);
@@ -112,9 +112,9 @@ class Client {
     }
   }
 
-  InvokeManager _invokeManager;
-  IOManager _ioManager;
-  Client([List<String> uris]) {
+  late InvokeManager _invokeManager;
+  late IOManager _ioManager;
+  Client([List<String>? uris]) {
     init();
     _invokeManager = InvokeManager(call);
     _ioManager = IOManager(transport);
@@ -132,7 +132,7 @@ class Client {
     }
   }
 
-  dynamic useService([String namespace]) {
+  dynamic useService([String? namespace]) {
     return _Proxy(this, namespace);
   }
 
@@ -156,7 +156,7 @@ class Client {
     }
   }
 
-  Future<T> invoke<T>(String name, [List args, ClientContext context]) async {
+  Future<T?> invoke<T>(String name, [List? args, ClientContext? context]) async {
     context ??= ClientContext();
     context.init(this, T);
     args ??= [];
@@ -165,11 +165,11 @@ class Client {
         args[i] = await args[i];
       }
     }
-    return await _invokeManager.handler(name, args, context);
+    return await (_invokeManager.handler(name, args, context) as FutureOr<T?>);
   }
 
-  Future call(String name, List args, Context context) async {
-    var request = codec.encode(name, args, context);
+  Future call(String name, List? args, Context context) async {
+    var request = codec.encode(name, args, context as ClientContext);
     var response = await this.request(request, context);
     return codec.decode(response, context);
   }
@@ -179,11 +179,11 @@ class Client {
   }
 
   Future<Uint8List> transport(Uint8List request, Context context) {
-    var uri = (context as ClientContext).uri;
+    var uri = (context as ClientContext).uri!;
     var scheme = uri.scheme;
     if (_schemes.containsKey(scheme)) {
       var name = _schemes[scheme];
-      return _transports[name].transport(request, context);
+      return _transports[name!]!.transport(request, context);
     }
     throw Exception('The protocol $scheme is not supported.');
   }

@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class IntDeserializer extends BaseDeserializer<int> {
-  static final AbstractDeserializer<int> instance = IntDeserializer();
+  static final AbstractDeserializer<int?> instance = IntDeserializer();
   @override
-  int read(Reader reader, int tag) {
+  int? read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {
       return tag - 0x30;
     }
@@ -26,9 +26,9 @@ class IntDeserializer extends BaseDeserializer<int> {
     switch (tag) {
       case TagInteger:
       case TagLong:
-        return ValueReader.readInt(stream);
+        return ValueReader.readInt(stream!);
       case TagDouble:
-        return (ValueReader.readDouble(stream)).floor();
+        return (ValueReader.readDouble(stream!)).floor();
       case TagTrue:
         return 1;
       case TagFalse:
@@ -37,7 +37,7 @@ class IntDeserializer extends BaseDeserializer<int> {
       case TagString:
         return int.parse(ReferenceReader.readString(reader));
       case TagUTF8Char:
-        return stream.readString(1).codeUnitAt(1);
+        return stream!.readString(1).codeUnitAt(1);
       case TagDate:
         return ReferenceReader.readDateTime(reader).millisecondsSinceEpoch;
       case TagTime:
